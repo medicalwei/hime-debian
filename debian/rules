@@ -4,6 +4,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+GTK2VER = $(shell pkg-config --variable=gtk_binary_version gtk+-2.0)
+GTK3VER = $(shell pkg-config --variable=gtk_binary_version gtk+-3.0)
+
 %:
 	dh $@ 
 
@@ -15,11 +18,11 @@ override_dh_auto_clean:
 	make clean
  
 override_dh_auto_install:
-	$(MAKE) install
-	mkdir -p debian/hime/usr/lib/gtk-2.0/$(GTKVER)/immodules
-	mv debian/hime/usr/lib/gtk-2.0/immodules/* debian/hime/usr/lib/gtk-2.0/$(GTKVER)/immodules/
-	mkdir -p debian/hime/usr/lib/gtk-3.0/$(GTKVER)/immodules
-	mv debian/hime/usr/lib/gtk-3.0/immodules/* debian/hime/usr/lib/gtk-3.0/$(GTKVER)/immodules/
+	make install DESTDIR=$(CURDIR)/debian/tmp
+	mkdir -p debian/hime/usr/lib/gtk-2.0/$(GTK2VER)/immodules
+	mv debian/tmp/usr/lib/gtk-2.0/immodules/* debian/hime/usr/lib/gtk-2.0/$(GTK2VER)/immodules/
+	mkdir -p debian/hime/usr/lib/gtk-3.0/$(GTK3VER)/immodules
+	mv debian/tmp/usr/lib/gtk-3.0/immodules/* debian/hime/usr/lib/gtk-3.0/$(GTK3VER)/immodules/
 
 override_dh_installchangelogs:
 	dh_installchangelogs Changelog.html
