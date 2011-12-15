@@ -11,5 +11,6 @@ Build-Depends: debhelper (>= 8.0.0), libgtk2.0-dev (>= 2.20.0), libxtst-dev, lib
 Package: hime
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: im-switch | im-config, anthy
 Description: GTK+ based input method for Chinese users
  <insert long description, indented with spaces>
