@@ -1,20 +1,170 @@
 Format: http://dep.debian.net/deps/dep5
 Upstream-Name: hime
-Source: <url://example.com>
+Upstream-Contact: Wen-Yen Chuang <caleb@calno.com> 
+Source: http://hime.luna.com.tw/
 
 Files: *
-Copyright: <years> <put author's name and email here>
-           <years> <likewise for another author>
-License: <special license>
- <Put the license of the package here indented by 1 space>
- <This follows the format of Description: lines in control file>
- .
- <Including paragraphs>
+Copyright: 2011 Edward Der-Hua Liu <cp76@csie.nctu.edu.tw>
+           2011 Wen-Yen Chuang <caleb@calno.com>
+License: LGPL-2.1
 
-# If you want to use GPL v2 or later for the /debian/* files use 
-# the following clauses, or change it to suit. Delete these two lines
 Files: debian/*
-Copyright: 2011 Yao Wei (魏銘廷) <mwei@lxde.org>
+Copyright: 2011 Kan-Ru Chen <koster@debian.org>
+           2011 Yao Wei <mwei@lxde.org>
+License: GPL-2+
+
+Files: eggtrayicon.cpp eggtrayicon.h
+Copyright: 2002 Anders Carlsson <andersca@gnu.org>
+License: LGPL-2.1+
+
+Files: data/jyutping.cin
+Copyright: 2001 Linguistic Society of Hong Kong
+License: Jyutping-license
+ This cin file is originally converted from the "phrase box" file
+ available on the Linguistic Society of Hong Kong's website:
+ http://www.hku.hk/linguist/lshk/
+ .
+ You are free to use and redistribute this file; the author only
+ wishes you keep the following notice intact:
+ .
+ "The copyright of the Jyutping phrase box belongs to the Linguistic
+ Society of Hong Kong.  We would like to thank the Jyutping Group of
+ the Linguistic Society of Hong Kong for permission to use the
+ electronic file in our research and/or product development."
+ .
+ For more information about the Jyutping system, visit the above
+ website.  The romanisation system is a little bit different from
+ common Hong Kong usage, but this system is a lot more systematic.
+
+Files: gtk-im/gtkimcontexthime.c gtk-im/gtkimcontexthime.h gtk-im/imhime.c
+Copyright: 2000 Red Hat, Inc.
+License: LGPL-2.1+
+
+Files: qt-im/qhimeinputcontext.h qt-im/qhimeinputcontextplugin.h
+       qt-im/qhimeinputcontextplugin_my.cpp
+Copyright: 2004 immodule for Qt Project.
+License: GPL-2 or QPL-1
+
+Files: IC.cpp IC.h IMdkit/include/IMdkit.h IMdkit/include/Xi18n.h
+       IMdkit/lib/IMConn.c IMdkit/lib/IMMethod.c IMdkit/lib/IMValues.c
+       IMdkit/lib/Xi18n.h IMdkit/lib/Xi18nX.h IMdkit/lib/XimFunc.h
+       IMdkit/lib/i18nAttr.c IMdkit/lib/i18nClbk.c IMdkit/lib/i18nIc.c
+       IMdkit/lib/i18nMethod.c IMdkit/lib/i18nPtHdr.c IMdkit/lib/i18nUtil.c
+       IMdkit/lib/i18nX.c
+Copyright:  1993-1994 Hewlett-Packard Company
+            1994-1995 Sun Microsystems, Inc.
+License: BSD-3-Clause
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+ provided that the above copyright notice appear in all copies and
+ that both that copyright notice and this permission notice appear
+ in supporting documentation, and that the name of Sun Microsystems, Inc.
+ and Hewlett-Packard not be used in advertising or publicity pertaining to
+ distribution of the software without specific, written prior permission.
+ Sun Microsystems, Inc. and Hewlett-Packard make no representations about
+ the suitability of this software for any purpose. It is provided "as is"
+ without express or implied warranty.
+ .
+ SUN MICROSYSTEMS INC. AND HEWLETT-PACKARD COMPANY DISCLAIMS ALL
+ WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+ SUN MICROSYSTEMS, INC. AND HEWLETT-PACKARD COMPANY BE LIABLE FOR ANY
+ SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+ RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Files: IMdkit/lib/FrameMgr.c IMdkit/lib/FrameMgr.h
+Copyright: 1993-1994 Digital Equipment Corporation
+License: BSD-3-Clause
+ Permission to use, copy, modify, and distribute this software and its 
+ documentation for any purpose and without fee is hereby granted, 
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in 
+ supporting documentation, and that the names of Digital or MIT not be
+ used in advertising or publicity pertaining to distribution of the
+ software without specific, written prior permission.  
+ .
+ DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+ DIGITAL BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
+ ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ SOFTWARE.
+
+Files: IMdkit/lib/i18nIMProto.c
+Copyright: 1993-1994 Digital Equipment Corporation
+           1993-1994 Hewlett-Packard Company
+           1994-1995 Sun Microsystems, Inc.
+License: BSD-3-Clause
+ Permission to use, copy, modify, and distribute this software and its 
+ documentation for any purpose and without fee is hereby granted, 
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in 
+ supporting documentation, and that the names of Digital or MIT not be
+ used in advertising or publicity pertaining to distribution of the
+ software without specific, written prior permission.  
+ .
+ DIGITAL AND HEWLETT-PACKARD COMPANY DISCLAIMS ALL WARRANTIES WITH REGARD
+ TO THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ FITNESS, IN NO EVENT SHALL DIGITAL AND HEWLETT-PACKARD COMPANY BE LIABLE
+ FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+ RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+ CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+License: LGPL-2.1
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published
+ by the Free Software Foundation; version 2.1 of the License.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in
+ "/usr/share/common-licenses/LGPL-2.1".
+
+License: LGPL-2.1+
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published
+ by the Free Software Foundation; either version 2.1 of the License, or
+ (at your option) any later version.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in
+ "/usr/share/common-licenses/LGPL-2.1".
+
+License: GPL-2
+ This package is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; version 2 of the License.
+ .
+ This package is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
+
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -32,5 +182,16 @@ License: GPL-2+
  On Debian systems, the complete text of the GNU General
  Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
 
-# Please also look if there are files or directories which have a
-# different copyright/license attached and list them here.
+License: QPL-1
+ This file may be distributed under the terms of the Q Public License
+ as defined by Trolltech AS of Norway and appearing in the file
+ LICENSE.QPL included in the packaging of this file.
+ .
+ This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+ WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ .
+ See http://www.trolltech.com/qpl/ for QPL licensing information.
+ .
+ Contact info@trolltech.com if any conditions of this licensing are
+ not clear to you.
+
