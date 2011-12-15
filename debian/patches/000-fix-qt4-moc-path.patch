@@ -1,0 +1,11 @@
+--- a/qt4-im/Makefile
++++ b/qt4-im/Makefile
+@@ -15,7 +15,7 @@
+ 	$(CXX) -E $(CFLAGS) $(INCS) $< > $@
+ 
+ moc_hime-qt.cpp:	hime-qt.h
+-	/usr/$(LIB)/$(QT)/bin/moc $< -o moc_hime-qt.cpp
++	/usr/share/$(QT)/bin/moc $< -o moc_hime-qt.cpp
+ 
+ im-hime.so: $(OBJS)
+ 	export LD_RUN_PATH=$(himelibdir) ;\
