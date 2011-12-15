@@ -14,3 +14,16 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Recommends: im-switch | im-config, anthy
 Description: GTK+ based input method for Chinese users
  <insert long description, indented with spaces>
+
+Package: hime-qt4-immodule
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
+Description: QT4 input method module with hime as backend
+ <insert long description, indented with spaces>
+
+Package: hime-gtk3-immodule
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
+Description: GTK3 input method module with hime as backend
+ <insert long description, indented with spaces>
+

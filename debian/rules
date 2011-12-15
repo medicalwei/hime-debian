@@ -19,10 +19,10 @@ override_dh_auto_clean:
  
 override_dh_auto_install:
 	make install DESTDIR=$(CURDIR)/debian/tmp
-	mkdir -p debian/hime/usr/lib/gtk-2.0/$(GTK2VER)/immodules
-	mv debian/tmp/usr/lib/gtk-2.0/immodules/* debian/hime/usr/lib/gtk-2.0/$(GTK2VER)/immodules/
-	mkdir -p debian/hime/usr/lib/gtk-3.0/$(GTK3VER)/immodules
-	mv debian/tmp/usr/lib/gtk-3.0/immodules/* debian/hime/usr/lib/gtk-3.0/$(GTK3VER)/immodules/
+	mkdir -p debian/tmp/usr/lib/gtk-2.0/$(GTK2VER)/immodules
+	mv debian/tmp/usr/lib/gtk-2.0/immodules/* debian/tmp/usr/lib/gtk-2.0/$(GTK2VER)/immodules/
+	mkdir -p debian/tmp/usr/lib/gtk-3.0/$(GTK3VER)/immodules
+	mv debian/tmp/usr/lib/gtk-3.0/immodules/* debian/tmp/usr/lib/gtk-3.0/$(GTK3VER)/immodules/
 
 override_dh_installchangelogs:
 	dh_installchangelogs Changelog.html
