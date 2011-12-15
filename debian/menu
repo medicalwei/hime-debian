@@ -1,0 +1,15 @@
+?package(hime): \
+	icon="/usr/share/pixmaps/gcin.xpm" \
+	title="hime" \
+	longtitle="hime input method editor" \
+	needs="x11" \
+	section="Applications/System/Language Environment" \
+	command="/usr/bin/hime"
+
+?package(hime): \
+	icon="/usr/share/pixmaps/gcin.xpm" \
+	title="hime-setup" \
+	longtitle="hime-setup, for hime input method editor" \
+	needs="x11" \
+	section="Applications/System/Language Environment" \
+	command="/usr/bin/hime-setup"
