@@ -22,3 +22,6 @@ override_dh_auto_install:
 
 override_dh_installchangelogs:
 	dh_installchangelogs Changelog.html
+
+override_dh_makeshlibs:
+	dh_makeshlibs -n
