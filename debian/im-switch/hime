@@ -1,4 +1,4 @@
-XIM=gcin
+XIM=hime
 XIM_PROGRAM=/usr/bin/hime
 XIM_ARGS=
 GTK_IM_MODULE=hime
