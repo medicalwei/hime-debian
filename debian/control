@@ -25,7 +25,7 @@ Package: hime-dev
 Section: devel
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
-Description: an GTK+ based input method platform - development files
+Description: GTK+ based input method - development files
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
