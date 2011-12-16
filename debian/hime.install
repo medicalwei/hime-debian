@@ -1,5 +1,9 @@
 usr/bin
 usr/lib/gtk-2.0
+usr/lib/hime/intcode-module.so
+usr/lib/hime/libhime-im-client.so.1.2.4
+usr/lib/hime/hime1.so
+usr/lib/hime/hime2.so
 usr/lib/hime
 usr/share/hime
 usr/share/applications
