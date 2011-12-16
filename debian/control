@@ -67,3 +67,12 @@ Description: support library to use anthy in hime
  .
  This package is the support library to use anthy in hime.
 
+Package: hime-chewing
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
+Description: support library to use chewing in hime
+ HIME Input Method Editor is a input method platform, which is forked
+ from the famous gcin input method.
+ .
+ This package is the support library to use chewing in hime.
+
