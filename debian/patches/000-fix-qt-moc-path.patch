@@ -9,3 +9,14 @@
  
  im-hime.so: $(OBJS)
  	export LD_RUN_PATH=$(himelibdir) ;\
+--- a/qt-im/Makefile
++++ b/qt-im/Makefile
+@@ -12,7 +12,7 @@
+ .cpp.E:
+ 	$(CXX) -E $(CFLAGS) $(INCS) $< > $@
+ .h.o:
+-	/usr/lib/$(QT)/bin/moc $< -o $<_moc.cpp
++	/usr/share/qt3/bin/moc $< -o $<_moc.cpp
+ 	$(CXX) -c -pipe $(CXXFLAGS) $(INCS) $<_moc.cpp -o $@
+ 
+ im-hime.so: $(OBJS)
