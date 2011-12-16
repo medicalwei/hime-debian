@@ -20,6 +20,16 @@ Description: GTK+ based input method for Chinese users
  This package contains only GTK2 immodule. For GTK3 and QT4 immodule, 
  please install hime-gtk3-immodule and hime-qt4-immodule packages.
 
+Package: hime-dev
+Section: devel
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
+Description: an GTK+ based input method platform - development files
+ HIME Input Method Editor is a input method platform, which is forked
+ from the famous gcin input method.
+ .
+ This package provides header files of hime.
+
 Package: hime-qt4-immodule
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
