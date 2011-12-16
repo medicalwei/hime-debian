@@ -1,10 +1,10 @@
-debian/tmp/usr/bin usr
-debian/tmp/usr/lib/gtk-2.0 usr/lib
-debian/tmp/usr/lib/hime usr/lib
-debian/tmp/usr/share/hime usr/share
-debian/tmp/usr/share/applications usr/share
-debian/tmp/usr/share/locale usr/share
-debian/tmp/usr/share/pixmaps usr/share
-debian/tmp/usr/share/man usr/share
-debian/tmp/usr/share/doc usr/share
+usr/bin
+usr/lib/gtk-2.0
+usr/lib/hime
+usr/share/hime
+usr/share/applications
+usr/share/locale
+usr/share/pixmaps
+usr/share/man
+usr/share/doc
 debian/im-switch/hime etc/X11/xinit/xinput.d
