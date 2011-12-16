@@ -1,2 +1,3 @@
 000-fix-qt-moc-path.patch
 001-fix-missing-manpages.patch
+002-fix-ftbfs-on-64bit-and-paths.patch
