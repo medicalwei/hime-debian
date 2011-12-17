@@ -28,41 +28,41 @@ Description: GTK+ based input method - development files
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package provides header files of hime.
+ This package provides header files of HIME.
 
 Package: hime-qt4-immodule
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
-Description: Qt4 input method module with hime as backend
+Description: Qt4 input method module with HIME as backend
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package is the Qt4 input method module (immodule) for hime.
+ This package is the Qt4 input method module (immodule) for HIME.
 
 Package: hime-gtk3-immodule
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
-Description: GTK3 input method module with hime as backend
+Description: GTK3 input method module with HIME as backend
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package is the GTK3 input method module (immodule) for hime.
+ This package is the GTK3 input method module (immodule) for HIME.
 
 Package: hime-anthy
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
-Description: support library to use anthy in hime
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version}), anthy
+Description: support library to use Anthy in HIME
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package is the support library to use anthy in hime.
+ This package is the support library to use anthy in HIME.
 
 Package: hime-chewing
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, hime (>= ${source:Version})
-Description: support library to use chewing in hime
+Description: support library to use Chewing in HIME
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package is the support library to use chewing in hime.
+ This package is the support library to use chewing in HIME.
 
