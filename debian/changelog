@@ -1,5 +1,6 @@
-hime (0.9-1) unstable; urgency=low
+hime (0.9+dfsg-1) unstable; urgency=low
 
   * Initial release (Closes: #652022)
+  * Remove Dayi input method table due to its non-free license.
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Thu, 15 Dec 2011 17:15:50 +0800
