@@ -4,17 +4,21 @@ Upstream-Contact: Wen-Yen Chuang <caleb@calno.com>
 Source: http://hime.luna.com.tw/
 
 Files: *
-Copyright: 2011 Edward Der-Hua Liu <cp76@csie.nctu.edu.tw>
-           2011 Wen-Yen Chuang <caleb@calno.com>
+Copyright: 2011 Edward Der-Hua Liu
+           2011 Chia-Wen Lin
+           2011 Huang, Kai-Chang
 License: LGPL-2.1
 
 Files: debian/*
-Copyright: 2011 Kan-Ru Chen <koster@debian.org>
-           2011 Yao Wei <mwei@lxde.org>
+Copyright: 2009 Wen-Yen Chuang 
+           2011 Kan-Ru Chen
+           2011 Yao Wei
 License: GPL-2+
+Comment: The package configurations is basically derived from gcin
+ package.
 
 Files: eggtrayicon.cpp eggtrayicon.h
-Copyright: 2002 Anders Carlsson <andersca@gnu.org>
+Copyright: 2002 Anders Carlsson
 License: LGPL-2.1+
 
 Files: data/jyutping.cin
@@ -51,8 +55,8 @@ Files: IC.cpp IC.h IMdkit/include/IMdkit.h IMdkit/include/Xi18n.h
        IMdkit/lib/i18nAttr.c IMdkit/lib/i18nClbk.c IMdkit/lib/i18nIc.c
        IMdkit/lib/i18nMethod.c IMdkit/lib/i18nPtHdr.c IMdkit/lib/i18nUtil.c
        IMdkit/lib/i18nX.c
-Copyright:  1993-1994 Hewlett-Packard Company
-            1994-1995 Sun Microsystems, Inc.
+Copyright: 1993-1994 Hewlett-Packard Company
+           1994-1995 Sun Microsystems, Inc.
 License: BSD-3-Clause
  Permission to use, copy, modify, distribute, and sell this software
  and its documentation for any purpose is hereby granted without fee,
