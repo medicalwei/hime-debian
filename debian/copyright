@@ -40,6 +40,13 @@ License: Jyutping-license
  website.  The romanisation system is a little bit different from
  common Hong Kong usage, but this system is a lot more systematic.
 
+Files: data/ar30.cin data/ar30-big.cin
+Copyright: 2010-2011 Ming-Te Liao
+License: ArrayIMLicense
+ This work is licensed under Array Input Method Public License.
+ You can get a full copy of the license at
+ "http://www.array.com.tw/company/array_license.pdf".
+
 Files: gtk-im/gtkimcontexthime.c gtk-im/gtkimcontexthime.h gtk-im/imhime.c
 Copyright: 2000 Red Hat, Inc.
 License: LGPL-2.1+
@@ -140,6 +147,10 @@ License: BSD-3-Clause
  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  PERFORMANCE OF THIS SOFTWARE.
 
+Files: hime.png
+Copyright: 2006-2009 Kasuga
+License: GFDL-1.2+ or CC-BY-SA-3.0
+
 License: LGPL-2.1
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published
@@ -221,3 +232,19 @@ License: QPL-1
  Contact info@trolltech.com if any conditions of this licensing are
  not clear to you.
 
+License: GFDL-1.2+
+ Permission is granted to copy, distribute and/or modify this document
+ under the terms of the GNU Free Documentation License, Version 1.2
+ or any later version published by the Free Software Foundation.
+ A copy of the license is included in the section entitled "GNU
+ Free Documentation License".
+ .
+ On Debian systems, the complete text of the GNU Free Documentation
+ License version 1.2 can be found in "/usr/share/common-licenses/GFDL-1.2".
+
+License: CC-BY-SA-3.0
+ This work is licensed under a Creative Commons Attribution-ShareAlike
+ 3.0 Unported License.
+ .
+ You can get a full copy of the license at
+ "http://creativecommons.org/licenses/by-sa/3.0/".
