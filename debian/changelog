@@ -1,4 +1,4 @@
-hime (0.9.9-1) UNRELEASED; urgency=low
+hime (0.9.9-1) unstable; urgency=low
 
   * Initial release (Closes: #652022)
   * Imported Upstream version 0.9.9
