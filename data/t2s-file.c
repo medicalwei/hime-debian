@@ -16,16 +16,19 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include "../t2s-file.h"
-#include "../util.h"
+#include "t2s-file.h"
+#include "util.h"
 
 T2S t2s[3000],s2t[3000];
 int t2sn;
 
-int qcmp(T2S *aa, T2S *bb)
+int qcmp(const void *aa0, const void *bb0)
 {
+  T2S *aa = (T2S *)aa0;
+  T2S *bb = (T2S *)bb0;
 #if 0
   int64_t a = aa->a;
   int64_t b = bb->a;

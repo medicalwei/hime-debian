@@ -4,7 +4,7 @@
 %selkey 1234567890
 %space_style 4
 #%keep_key_case
-%flag_auto_select_by_phrase
+#%flag_auto_select_by_phrase
 %endkey `\,'[]/.-;,./1234567890-()~!:
 %keyname begin
 a 日
@@ -17530,7 +17530,7 @@ MI 㺨
 HJ 秆
 MF 𩄍
 HN 秔
-#addtional
+#additional
 zf 0
 zf 1
 zf 2

@@ -6,14 +6,18 @@ if [ "$1" = "-h" -o "$1" = "--help" -o "$1" = "-help" ]; then
     echo "  --with_gtk3     : compile with GTK+ 3.x"
     echo "  --use_xim=N     : disable the support of XIM"
     echo "  --prefix=path   : install prefix (e.g. /usr)"
-#   TODO fix those not working options, or just drop them
+#   TODO fix not working option(s)
 #   echo "  --use_tray=N    : disable system tray"
+    echo "  --use_unity=N   : disable Ubuntu unity tray"
     echo "  --use_i18n=N    : disable i18n"
-#   echo "  --use_tsin=N    : disable Tsin input method"
+    echo "  --use_tsin=N    : disable Tsin input method"
     echo "  --use_anthy=N   : disable Anthy input method"
     echo "  --use_chewing=N : disable Chewing input method"
-    echo "  --use_qt3=N     : disable Qt 3.x immodule"
+    echo "  --use_qt3=Y     : enable Qt 3.x immodule"
     echo "  --use_qt4=N     : disable Qt 4.x immodule"
+    echo "  --qt3-moc-path  : specify the path of \"moc\" tool for Qt 3.x"
+    echo "  --qt4-moc-path  : specify the path of \"moc\" tool for Qt 4.x"
+    echo "  --qt4-install-to: install path for Qt 4.x input method plugin."
     echo "  --use_gtk=N     : disable GTK+ 2.x immodule"
     echo "  --use_gtk3=N    : disable GTK+ 3.x immodule"
     exit
@@ -49,14 +53,46 @@ fi
 prefix="/usr/local"
 use_xim='Y'
 use_tray='Y'
+use_unity='Y'
 use_i18n='Y'
 use_tsin='Y'
 use_anthy='Y'
 use_chewing='Y'
-use_qt3='Y'
+# Qt3 immodule patch is not included in official Qt3 release.
+# Some distros do not apply that patch and will always build failure.
+# We should turn off Qt3 immodule by default.
+use_qt3='N'
 use_qt4='Y'
 use_gtk='Y'
 use_gtk3='Y'
+
+function find_in_path_list_to_variable() {
+    # find_in_path_list_to_variable() will find all elements in the array name stored in $1
+    # if found, set the found path to variable name in $2 and return 0
+    # otherwise return 1.
+	 
+	 eval "L=(\${"${1}"[@]})"
+	 for path in ${L[@]}; do
+		  if [ -x "$path" ]; then
+				eval $2=\"$path\"
+				return 0
+		  fi
+	 done
+	 return 1
+}
+
+qt4_moc_path_list=(
+	 "/usr/share/qt4/bin/moc"	#debian (Thanks to medicalwei)
+	 "/usr/lib/qt4/bin/moc"	# fedora (Thanks to petercommand)
+	 "/usr/bin/moc-qt4"	# fedora (Thanks to petercommand)
+	 "/usr/local/bin/moc"	# slackware	# always keep generic name with lower priority
+	 "/usr/bin/moc"			# arch	# always keep generic name with lower priority
+)
+
+qt3_moc_path_list=(
+	 "/usr/share/qt3/bin/moc"	#debian
+	 "/opt/qt/bin/moc"			# always keep generic name with lower priority
+)
 
 if [ "$HIME_USE_XIM" ]; then
   use_xim=$HIME_USE_XIM
@@ -71,6 +107,8 @@ for opt do
   --use_xim=*) use_xim=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_tray=*) use_tray=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --use_unity=*) use_unity=`echo $opt | cut -d '=' -f 2`
   ;;
   --use_i18n=*) use_i18n=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -88,6 +126,12 @@ for opt do
   ;;
   --use_gtk3=*) use_gtk3=`echo $opt | cut -d '=' -f 2`
   ;;
+  --qt3-moc-path=*) QT3_MOC_PATH=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --qt4-moc-path=*) QT4_MOC_PATH=`echo $opt | cut -d '=' -f 2`
+  ;;
+  --qt4-install-to=*) QT4_IM_DIR=`echo $opt | cut -d '=' -f 2`
+  ;;
   esac
 done
 
@@ -97,7 +141,7 @@ if [ -z "$GTK" ]; then
   GTK=gtk+-2.0
 fi
 
-echo -n ".... Testing $GTK : "
+echo -n ".... Testing $GTK    : "
 
 GTKINC=`pkg-config --cflags $GTK`
 
@@ -119,6 +163,7 @@ if [ $MAC_OS = 1 ]; then
   GTKINC="-I/sw/include `pkg-config --cflags $GTK`"
 fi
 
+# TODO: Do we really need these craps?
 if [ ! -x /bin/bash ]; then
   for i in /usr/bin/bash /usr/local/bin/bash
   do
@@ -144,13 +189,13 @@ else
   echo " found."
 fi
 
-echo -n ".... Testing anthy    :  "
-USE_ANTHY=`pkg-config --libs anthy`
+echo -n ".... Testing anthy       :  "
+USE_ANTHY=`pkg-config --libs anthy 2> /dev/null`
 if [ $? != 0 ]; then
+  echo not found, anthy module is turned off.
   USE_ANTHY=N
-  echo "It's ok if you don't want anthy support."
 else
-  if [ $use_anthy = "N" ]; then
+  if [ "$use_anthy" = "N" ]; then
     USE_ANTHY='N'
     echo "disabled."
   else
@@ -159,11 +204,11 @@ else
   fi
 fi
 
-echo -n ".... Testing chewing  :  "
-USE_CHEWING=`pkg-config --libs chewing`
+echo -n ".... Testing chewing     :  "
+USE_CHEWING=`pkg-config --libs chewing 2> /dev/null`
 if [ $? != 0 ]; then
+  echo not found, chewing module is turned off.
   USE_CHEWING=N
-  echo "It's ok if you don't want libchewing support."
 else
   if [ $use_chewing = "N" ]; then
     USE_CHEWING='N'
@@ -174,50 +219,116 @@ else
   fi
 fi
 
+if [ "$use_unity" = "Y" ]; then
+  echo -n ".... Testing appindicator:  "
+  if [ "$GTK" = "gtk+-3.0" ]; then
+    USE_UNITY=`pkg-config --libs appindicator3-0.1 2> /dev/null`
+  else
+    USE_UNITY=`pkg-config --libs appindicator-0.1 2> /dev/null`
+  fi
+  if [ $? != 0 ]; then
+    echo not found, unity tray is turned off.
+    USE_UNITY=N
+  else
+    if [ "$use_unity" = "N" ]; then
+      USE_UNITY='N'
+      echo "disabled."
+    else
+      USE_UNITY='Y'
+      echo "found."
+      UNITY_INC="-I/usr/include/libappindicator-0.1"
+      if [ "$GTK" = "gtk+-3.0" ]; then
+        GTKINC=`pkg-config --cflags $GTK appindicator3-0.1`
+        GTKLDFLAGS=`pkg-config --libs $GTK appindicator3-0.1`
+      else
+        GTKINC=`pkg-config --cflags $GTK appindicator-0.1`
+        GTKLDFLAGS=`pkg-config --libs $GTK appindicator-0.1`
+      fi
+    fi
+  fi
+fi
 
 LIB='lib'
 if [ -d /usr/lib64 -a -d /lib64 ]; then
 LIB='lib64'
 fi
+DEBIAN_LD=`ld -v 2>&1 | grep -i debian`
+UBUNTU_LD=`ld -v 2>&1 | grep -i ubuntu`
+if [ "$DEBIAN_LD" != "" -o "$UBUNTU_LD" != "" ]; then
+  LIB='lib'
+fi
 
+# --- QT3 START ---
 QT_IM='N'
 QT_IM_DIR=/usr/$LIB/qt3/plugins/inputmethods
-echo "testing if you have qt3 support"
+echo -n ".... Testing Qt 3.x      :  "
 pkg-config --libs qt-mt > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   QT_IM='Y'
 fi
 
-if [ $QT_IM = "Y" ]; then
-    if [ $use_qt3 = "N" ]; then
-        QT_IM='N'
-        echo "-> Yes, but disabled."
-    else
-        echo "-> Yes, you have Qt3 support."
-    fi
-else
-    echo "-> No, you don't have. It's ok if you don't want Qt3 immodule."
+if [ ! -x "$QT3_MOC_PATH" ]; then
+	 find_in_path_list_to_variable "qt3_moc_path_list" "QT3_MOC_PATH"
 fi
 
+if [ "$QT_IM" = "Y" ]; then
+    if [ "$use_qt3" = "N" ]; then
+        QT_IM='N'
+        echo "found, but disabled."
+    else
+		  if [ ! -x "$QT3_MOC_PATH" ]; then
+				echo "not found, cannot find \"moc\" tool for Qt 3.x."
+				echo "Hint: use the --qt3-moc-path option."
+				exit 1
+		  fi
+        echo "found."
+    fi
+else
+    echo "not found, Qt 3.x immodule is turned off."
+fi
+# --- QT3 END ---
 
+# --- QT4 START ---
 QT4_IM='N'
-QT4_IM_DIR=/usr/$LIB/qt4/plugins/inputmethods
-echo "testing if you have qt4 support"
+if [ -z "$QT4_IM_DIR" ]; then QT4_IM_DIR=/usr/$LIB/qt4/plugins/inputmethods; fi
+
+echo -n ".... Testing Qt 4.x      :  "
 pkg-config --libs QtCore QtGui > /dev/null 2> /dev/null
 if [ $? = 0 ]; then
   QT4_IM='Y'
 fi
 
-if [ $QT4_IM = "Y" ]; then
-    if [ $use_qt4 = "N" ]; then
+if [ ! -x "${QT4_MOC_PATH}" ]; then
+	 find_in_path_list_to_variable "qt4_moc_path_list" "QT4_MOC_PATH"
+fi
+
+if [ "$QT4_IM" = "Y" ]; then
+    if [ "$use_qt4" = "N" ]; then
         QT4_IM='N'
-        echo "-> Yes, but disabled."
+        echo "found, but disabled."
     else
-        echo "-> Yes, you have Qt4 support."
+		  if [ ! -x "$QT4_MOC_PATH" ]; then
+				echo "not found, cannot find \"moc\" tool for Qt 4.x."
+				echo "Hint: use the --qt4-moc-path option."
+				exit 1
+		  fi		  
+        echo "found."
     fi
 else
-    echo "-> No, you don't have. It's ok if you don't want Qt4 immodule."
+    echo "not found, Qt 4.x immodule is turned off."
 fi
+# --- QT4 END ---
+
+# --- MOC INFO START ---
+
+echo
+echo ========================================
+if [ "$QT_IM" = "Y" ]; then echo -e "Qt3 moc = ${QT3_MOC_PATH}"; fi
+if [ "$QT4_IM" = "Y" ]; then echo -e "Qt4 moc = ${QT4_MOC_PATH}"; fi
+echo ========================================
+echo
+
+# --- MOC INFO END ---
 
 if [ "$GTK"=gtk+-3.0 ]; then
   GTK_IM='N'
@@ -227,8 +338,8 @@ if [ "$GTK"=gtk+-3.0 ]; then
     GTK_IM='Y'
   fi
   
-  if [ $GTK_IM = "Y" ]; then
-      if [ $use_gtk = "N" ]; then
+  if [ "$GTK_IM" = "Y" ]; then
+      if [ "$use_gtk" = "N" ]; then
           GTK_IM='N'
           echo "-> Yes, but disabled."
       else
@@ -246,8 +357,8 @@ if [ $? = 0 ]; then
   GTK3_IM='Y'
 fi
 
-if [ $GTK3_IM = "Y" ]; then
-    if [ $use_gtk3 = "N" ]; then
+if [ "$GTK3_IM" = "Y" ]; then
+    if [ "$use_gtk3" = "N" ]; then
         GTK3_IM='N'
         echo "-> Yes, but disabled."
     else
@@ -255,6 +366,13 @@ if [ $GTK3_IM = "Y" ]; then
     fi
 else
     echo "-> No, you don't have. It's ok if you don't want GTK+ 3.x immodule."
+fi
+
+[ -f "data/dayi3.cin" ] && INSTALL_DFSG_INCOMPATIBLE=Y
+
+if [ -d .git ]; then
+  GIT_HAVE='Y'
+  GIT_HASH=`git log 2> /dev/null | head -n 1 | cut -d ' ' -f 2 | head -c 7`
 fi
 
 bindir=$prefix/bin
@@ -266,7 +384,7 @@ optdir=/opt
 HIME_VERSION=`cat VERSION.hime`
 
 BUILD_MODULE='N'
-if [ $USE_ANTHY = 'Y' ] || [ $USE_CHEWING = 'Y' ]; then
+if [ "$USE_ANTHY" = 'Y' ] || [ "$USE_CHEWING" = 'Y' ]; then
   BUILD_MODULE='Y'
 fi
 
@@ -275,14 +393,19 @@ if [ -z "$CFLAGS" ]; then
 else
   OPTFLAGS="$CFLAGS"
 fi
+echo "-> CFLAGS = $CFLAGS."
 
-if [ -z $CC ]; then
+if [ -z "$CC" ]; then
   CC=gcc
 fi
 
+if [ -z "$CXX" ]; then
+  CXX=g++
+fi
+
 echo "CC=$CC" > config.mak
-echo "CCX=$CC -x c" >> config.mak
-echo "CXX=$CC" >> config.mak
+echo "CCX=$CC" >> config.mak
+echo "CXX=$CXX" >> config.mak
 echo "CCLD=$CC" >> config.mak
 echo "MAKE=$MAKE" >> config.mak
 echo "GTKINC=$GTKINC" >> config.mak
@@ -293,6 +416,7 @@ echo "man1dir=\$(mandir)/man1" >> config.mak
 echo "bindir_r=$bindir" >> config.mak
 echo "datadir=\$(DESTDIR)$datadir" >> config.mak
 echo "datadir_r=$datadir" >> config.mak
+echo "filterdir=\$(datadir_r)/hime/filter" >> config.mak
 echo "libdir=\$(DESTDIR)$libdir" >> config.mak
 echo "himelibdir=\$(libdir)/hime" >> config.mak
 echo "includedir=\$(DESTDIR)$includedir" >> config.mak
@@ -316,6 +440,10 @@ echo "QT_IM=$QT_IM" >> config.mak
 echo "QT_IM_DIR=$QT_IM_DIR" >> config.mak
 echo "QT4_IM=$QT4_IM" >> config.mak
 echo "QT4_IM_DIR=$QT4_IM_DIR" >> config.mak
+echo "QT3_MOC_PATH=$QT3_MOC_PATH" >> config.mak
+echo "QT4_MOC_PATH=$QT4_MOC_PATH" >> config.mak
+echo "QT3_QMAKE_PATH=$QT3_MOC_PATH" | sed 's/moc/qmake/' >> config.mak
+echo "QT4_QMAKE_PATH=$QT4_MOC_PATH" | sed 's/moc/qmake/' >> config.mak
 echo "GTK_IM=$GTK_IM" >> config.mak
 echo "GTK3_IM=$GTK3_IM" >> config.mak
 echo "USE_XIM=$use_xim" >> config.mak
@@ -327,13 +455,10 @@ echo "USE_I18N=$use_i18n" >> config.mak
 echo "USE_TSIN=$use_tsin" >> config.mak
 echo "USE_ANTHY=$USE_ANTHY" >> config.mak
 echo "USE_CHEWING=$USE_CHEWING" >> config.mak
+echo "USE_UNITY=$USE_UNITY" >> config.mak
+echo "INSTALL_DFSG_INCOMPATIBLE=$INSTALL_DFSG_INCOMPATIBLE" >> config.mak
+echo "GIT_HAVE=$GIT_HAVE" >> config.mak
+echo "GIT_HASH=$GIT_HASH" >> config.mak
 echo "BUILD_MODULE=$BUILD_MODULE" >> config.mak
-
-if [ $prefix = /usr/local ]; then
-  echo "hime_ld_run_path=$PWD:\$(himelibdir)" >> config.mak
-  echo "HIME_DEBUG=0" >> config.mak
-else
-  echo "hime_ld_run_path=\$(himelibdir)" >> config.mak
-fi
-
+echo "hime_ld_run_path=\$(himelibdir)" >> config.mak
 echo "gcc_ld_run_path=-Wl,-rpath,\$(hime_ld_run_path)" >> config.mak
