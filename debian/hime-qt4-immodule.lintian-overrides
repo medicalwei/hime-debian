@@ -1,0 +1,2 @@
+# rpath is used for not-so-public library.
+binary-or-shlib-defines-rpath usr/lib/qt4/plugins/inputmethods/im-hime.so /usr/lib/hime

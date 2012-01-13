@@ -1,0 +1,2 @@
+# rpath is used for not-so-public library.
+binary-or-shlib-defines-rpath usr/lib/gtk-3.0/3.0.0/immodules/im-hime.so /usr/lib/hime
