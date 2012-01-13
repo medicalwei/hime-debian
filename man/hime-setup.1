@@ -54,26 +54,6 @@ OPTIONS     MEANINGS
 14          Latin letters input method
 .br
 15          Jyutping input method
-.br
-16          NewCJ3 input method
-.IP "\fB$HOME/.config/hime/config/gcb-position\fP \fInumber\fP"
-Disable or enable gcb clipboard manager.
-.PP
-OPTIONS     MEANINGS
-.br
-0           Disable
-.br
-1           Enable, at lower left corner
-.br
-2           Enable, at upper left corner
-.br
-3           Enable, at lower right corner
-.br
-\fB4           Enable, at upper right corner\fP
-.IP "\fB$HOME/.config/hime/config/gcb-position-x\fP \fInumber\fP"
-The X-axis padding of gcb clipboard manager. Default is \fB0\fP.
-.IP "\fB$HOME/.config/hime/config/gcb-position-y\fP \fInumber\fP"
-The Y-axis padding of gcb clipboard manager. Default is \fB0\fP.
 .IP "\fB$HOME/.config/hime/config/hime-bell-volume\fP \fInumber\fP"
 Volume of bell ring, between \-100 to 100. Default is \fB-97\fP.
 .IP "\fB$HOME/.config/hime/config/hime-capslock-lower\fP \fIboolean\fP"
@@ -92,51 +72,6 @@ OPTIONS     MEANINGS
 \fB1           ON\fP
 .br
 0           OFF
-.IP "\fB$HOME/.config/hime/config/hime-flags-im-enabled\fP \fInumber\fP"
-Available input methods to be cyclic selected by Control-Shift.
-.PP
-OPTIONS     MEANINGS
-.br
-\fB2147483647  All input methods are enabled.\fP
-.br
-.PP
-         2  Ctrl\-Alt\-1 Chanjei input method, version 3
-.br
-         4  Ctrl\-Alt\-2 Chanjei input method, version 5
-.br
-         8  Ctrl\-Alt\-3 Bopomofo input method
-.br
-        16  Ctrl\-Alt\-4 Symbols virtual keyboard
-.br
-        32  Ctrl\-Alt\-5 Pinyin input method
-.br
-        64  Ctrl\-Alt\-6 Tsin intelligent Bopomofo input method
-.br
-       128  Ctrl\-Alt\-7 Dayi input method
-.br
-       256  Ctrl\-Alt\-8 Array input method, 30 keys version
-.br
-       512  Ctrl\-Alt\-9 Boshiamy input method, aka Liu's input method
-.br
-      1024  Ctrl\-Alt\-0 Direct input for UTF-32 (U+) or Big-5 characters
-.br
-      2048  Ctrl\-Alt\-\- Simple Chanjei input method
-.br
-      4096  Ctrl\-Alt\-= Japanese anthy input method
-.br
-      8192  Ctrl\-Alt\-` Greek letters input method
-.br
-     16384  Ctrl\-Alt\-[ Latin letters input method
-.br
-     32768  Ctrl\-Alt\-\] Jyutping input method
-.br
-     65536  Ctrl\-Alt\-\\ NewCJ3 input method
-.PP
-2147483647 minus numbers of input methods, then you get the configuration number. For example, to disable Greek and Latin letters, calculate 2147483647 - 8192 - 16384 = 2147459071.
-.PP
-        echo 2147459071 > $HOME/.config/hime/config/hime-flags-im-enabled
-.PP
-Then you get it.
 .IP "\fB$HOME/.config/hime/config/hime-font-name\fP \fIstring\fP"
 Default font.
 .PP
@@ -411,14 +346,6 @@ OPTIONS     MEANINGS
 1           ON
 .br
 \fB0           OFF\fP
-.IP "\fB$HOME/.config/hime/config/left-right-button-tips\fP \fIboolean\fP"
-Show button tips when mouse cursor stays on hime window. Default is ON, but it will be turned OFF after \fBhime-setup\fP is executed.
-.PP
-OPTIONS     MEANINGS
-.br
-\fB1           ON\fP
-.br
-0           OFF
 .IP "\fB$HOME/.config/hime/config/pho-hide-row2\fP \fIboolean\fP"
 Hide second row of window in Bopomofo and Tsin IM.
 .PP

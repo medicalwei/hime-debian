@@ -9,7 +9,7 @@
 #  （即行列輸入法發明人）慷慨提供支援 unicode 3.1 中日韓漢字集共七萬  #
 #  餘字的完整對照檔，製作而成。                                       #
 #                                                                     #
-#  本檔案跟行列科技所提供的原始檔案一樣公開授權，又或可依據 GNU       #
+#  本檔案跟行列科技所提供的原始檔案一樣公開授權(array_license.pdf)，又或可依據 GNU       #
 #  General Public License (GPL) version 2 或新版公開授權，歡迎各界分  #
 #  布及使用。在此謹致謝行列科技之慷慨大方，讓大家可免費自由地使用行   #
 #  列輸入法。                                                         #
@@ -82190,42 +82190,4 @@ w9	φ
 w9	χ
 w9	ψ
 w9	ω
-nctu	交通大學
-ntu	台灣大學
-ncku	成功大學
-nthu	清華大學
-csie	資訊工程
-tw	台灣
-down	下載
-talk	聊天
-net	上網
-fool	傻瓜
-idio	白癡
-chat	聊天室
-room	房間
-tpe	台北
-acer	宏碁
-benq	明基
-asus	華碩
-cd	CD
-ibm	IBM
-linux	Linux
-gnome	GNOME
-kde	KDE
-gaim	gaim
-xmms	xmms
-xine	xine
-gedit	gedit
-kate	kate
-kedit	kedit
-adsl	ADSL
-hbo	HBO
-tvbs	TVBS
-dvd	DVD
-vcd	VCD
-lcd	LCD
-fedor	Fedora
-mandr	Mandriva
-debia	Debian
-suse	SUSE
 %chardef end
