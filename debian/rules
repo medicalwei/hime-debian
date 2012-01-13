@@ -10,6 +10,9 @@ GTK3VER = $(shell pkg-config --variable=gtk_binary_version gtk+-3.0)
 %:
 	dh $@ 
 
+override_dh_auto_configure:
+	dh_auto_configure -- --qt4-install-to=/usr/$LIB/`dpkg-architecture -qDEB_HOST_MULTIARCH`/qt4/plugins/inputmethods
+
 override_dh_auto_clean:
 	make clean
  
