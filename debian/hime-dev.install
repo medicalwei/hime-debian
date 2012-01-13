@@ -1,1 +1,1 @@
-im-client/hime-im-client.h usr/include
+./src/im-client/hime-im-client.h usr/include
