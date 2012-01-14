@@ -24,7 +24,7 @@ Description: GTK+ based input method for Chinese users
 
 Package: hime-data
 Architecture: all
-Depends: ${misc:Depends}, hime (>= ${source:Version})
+Depends: ${misc:Depends}
 Description: GTK+ based input method - input method tables and scripts
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
