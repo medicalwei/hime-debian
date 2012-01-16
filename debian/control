@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 8.0.0), libgtk2.0-dev (>= 2.20.0), libgtk-3-dev,
 
 Package: hime
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, hime-data
+Depends: ${shlibs:Depends}, ${misc:Depends}, hime-data, hime-tables
 Recommends: im-switch | im-config, hime-gtk3-immodule
 Suggests: hime-anthy, hime-chewing, hime-qt4-immodule
 Description: GTK+ based input method for Chinese users
@@ -25,12 +25,21 @@ Description: GTK+ based input method for Chinese users
 Package: hime-data
 Architecture: all
 Depends: ${misc:Depends}
-Description: GTK+ based input method - input method tables and scripts
+Description: GTK+ based input method - icons, locales and scripts
  HIME Input Method Editor is a input method platform, which is forked
  from the famous gcin input method.
  .
- This package contains architecture-independent input method tables and
- scripts.
+ This package contains icons, locales, scripts and other architecture-
+ independent things.
+
+Package: hime-tables
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: GTK+ based input method - input method tables
+ HIME Input Method Editor is a input method platform, which is forked
+ from the famous gcin input method.
+ .
+ This package contains architecture-dependent input method tables.
 
 Package: hime-dev
 Section: devel
