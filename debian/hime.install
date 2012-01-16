@@ -6,4 +6,5 @@ usr/lib/hime/libhime-im-client.so.1.2.4
 usr/lib/hime/libhime-im-client.so
 usr/lib/hime/hime1.so
 usr/lib/hime/hime2.so
+usr/share/applications
 debian/im-switch/hime etc/X11/xinit/xinput.d
