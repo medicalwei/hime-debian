@@ -1,8 +1,5 @@
 hime (0.9.9-1) unstable; urgency=low
 
   * Initial release (Closes: #652022)
-  * Imported Upstream version 0.9.9
-  * Changed Qt4 install path for ftbfs with debian multiarch.
-  * Removed Dayi input method table (by upstream) due to its non-free license.
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sat, 14 Jan 2012 00:24:08 +0800
