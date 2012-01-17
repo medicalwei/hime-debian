@@ -1,7 +1,7 @@
 Source: hime
 Section: utils
 Priority: optional
-Maintainer: IME Packaging Team <pkg-ime-devel@lists.debian.org>
+Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
 Uploaders: Yao Wei (魏銘廷) <mwei@lxde.org>
 Standards-Version: 3.9.2
 Homepage: http://hime.luna.com.tw
