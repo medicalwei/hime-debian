@@ -48,7 +48,8 @@ License: ArrayIMLicense
  "http://www.array.com.tw/company/array_license.pdf".
 
 Files: src/gtk-im/gtkimcontexthime.c src/gtk-im/gtkimcontexthime.h
-       src/gtk3-im/gtkimcontexthime.c src/gtk3-im/gtkimcontexthime.h
+       src/gtk-im/imhime.c src/gtk3-im/gtkimcontexthime.c
+       src/gtk3-im/gtkimcontexthime.h src/gtk3-im/imhime.c
 Copyright: 2000 Red Hat, Inc.
 License: LGPL-2.1+
 
