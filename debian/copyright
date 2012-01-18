@@ -17,7 +17,7 @@ License: GPL-2+
 Comment: The package configurations is basically derived from gcin
  package.
 
-Files: eggtrayicon.cpp eggtrayicon.h
+Files: src/eggtrayicon.cpp src/eggtrayicon.h
 Copyright: 2002 Anders Carlsson
 License: LGPL-2.1+
 
@@ -47,21 +47,24 @@ License: ArrayIMLicense
  You can get a full copy of the license at
  "http://www.array.com.tw/company/array_license.pdf".
 
-Files: gtk-im/gtkimcontexthime.c gtk-im/gtkimcontexthime.h gtk-im/imhime.c
+Files: src/gtk-im/gtkimcontexthime.c src/gtk-im/gtkimcontexthime.h
+       src/gtk3-im/gtkimcontexthime.c src/gtk3-im/gtkimcontexthime.h
 Copyright: 2000 Red Hat, Inc.
 License: LGPL-2.1+
 
-Files: qt-im/qhimeinputcontext.h qt-im/qhimeinputcontextplugin.h
-       qt-im/qhimeinputcontextplugin_my.cpp
+Files: src/qt-im/qhimeinputcontext.h src/qt-im/qhimeinputcontextplugin.h
+       src/qt-im/qhimeinputcontextplugin_my.cpp
 Copyright: 2004 immodule for Qt Project.
 License: GPL-2 or QPL-1
 
-Files: IC.cpp IC.h IMdkit/include/IMdkit.h IMdkit/include/Xi18n.h
-       IMdkit/lib/IMConn.c IMdkit/lib/IMMethod.c IMdkit/lib/IMValues.c
-       IMdkit/lib/Xi18n.h IMdkit/lib/Xi18nX.h IMdkit/lib/XimFunc.h
-       IMdkit/lib/i18nAttr.c IMdkit/lib/i18nClbk.c IMdkit/lib/i18nIc.c
-       IMdkit/lib/i18nMethod.c IMdkit/lib/i18nPtHdr.c IMdkit/lib/i18nUtil.c
-       IMdkit/lib/i18nX.c
+Files: src/IC.cpp src/IC.h src/IMdkit/include/src/IMdkit.h
+       src/IMdkit/include/Xi18n.h src/IMdkit/lib/IMConn.c
+       src/IMdkit/lib/IMMethod.c src/IMdkit/lib/IMValues.c
+       src/IMdkit/lib/Xi18n.h src/IMdkit/lib/Xi18nX.h
+       src/IMdkit/lib/XimFunc.h src/IMdkit/lib/i18nAttr.c
+       src/IMdkit/lib/i18nClbk.c src/IMdkit/lib/i18nIc.c
+       src/IMdkit/lib/i18nMethod.c src/IMdkit/lib/i18nPtHdr.c
+       src/IMdkit/lib/i18nUtil.c src/IMdkit/lib/i18nX.c
 Copyright: 1993-1994 Hewlett-Packard Company
            1994-1995 Sun Microsystems, Inc.
 License: BSD-3-Clause
@@ -85,7 +88,7 @@ License: BSD-3-Clause
  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
  IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Files: IMdkit/lib/FrameMgr.c IMdkit/lib/FrameMgr.h
+Files: src/IMdkit/lib/FrameMgr.c src/IMdkit/lib/FrameMgr.h
 Copyright: 1993-1994 Digital Equipment Corporation
 License: BSD-3-Clause
  Permission to use, copy, modify, and distribute this software and its 
@@ -104,7 +107,7 @@ License: BSD-3-Clause
  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
  SOFTWARE.
 
-Files: IMdkit/lib/i18nIMProto.c
+Files: src/IMdkit/lib/i18nIMProto.c
 Copyright: 1993-1994 Digital Equipment Corporation
            1993-1994 Hewlett-Packard Company
            1994-1995 Sun Microsystems, Inc.
@@ -125,7 +128,7 @@ License: BSD-3-Clause
  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
  CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Files: IMdkit/include/XimProto.h
+Files: src/IMdkit/include/XimProto.h
 Copyright: 1992-1994 FUJITSU LIMITED
 License: BSD-3-Clause
  Permission to use, copy, modify, distribute, and sell this software
@@ -147,7 +150,7 @@ License: BSD-3-Clause
  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
  PERFORMANCE OF THIS SOFTWARE.
 
-Files: hime.png
+Files: icons/hime.png
 Copyright: 2006-2009 Kasuga
 License: GFDL-1.2+ or CC-BY-SA-3.0
 
