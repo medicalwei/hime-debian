@@ -5,14 +5,14 @@ Source: http://hime.luna.com.tw/
 
 Files: *
 Copyright: 2011 Edward Der-Hua Liu
-           2012 Chia-Wen Lin
-           2012 Huang, Kai-Chang
+           2011-2012 Chia-Wen Lin
+           2011-2012 Huang, Kai-Chang
 License: LGPL-2.1
 
 Files: debian/*
 Copyright: 2009 Wen-Yen Chuang 
            2011 Kan-Ru Chen
-           2012 Yao Wei
+           2011-2012 Yao Wei
 License: GPL-2+
 Comment: The package configuration is basically derived from gcin
  package.
