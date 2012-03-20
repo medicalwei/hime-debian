@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,6 +41,7 @@ static GtkWidget *button, *button2, *check_button_phonetic_speak, *opt_speaker_o
 static GtkWidget *opt_im_toggle_keys, *check_button_hime_remote_client,
        *check_button_hime_shift_space_eng_full,
        *check_button_hime_init_im_enabled,
+       *check_button_hime_init_full_mode,
        *check_button_hime_eng_phrase_enabled,
        *check_button_hime_win_sym_click_close,
        *check_button_hime_punc_auto_send;
@@ -268,6 +269,9 @@ static void cb_ok (GtkWidget *button, gpointer data)
   save_hime_conf_int(HIME_INIT_IM_ENABLED,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_hime_init_im_enabled)));
 
+  save_hime_conf_int(HIME_INIT_FULL_MODE,
+    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_hime_init_full_mode)));
+
   save_hime_conf_int(HIME_ENG_PHRASE_ENABLED,
     gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_button_hime_eng_phrase_enabled)));
 
@@ -293,7 +297,7 @@ static void cb_ok (GtkWidget *button, gpointer data)
 
   gtk_widget_destroy(gtablist_window); gtablist_window = NULL;
 
-  /* caleb- does found where "reload" is used.
+  /* caleb- did not found where "reload" is used.
    * caleb- think the send_hime_message() here does nothing.
    */
   send_hime_message(GDK_DISPLAY(), "reload");
@@ -578,12 +582,16 @@ void create_gtablist_window (void)
     return;
   }
 
+  load_setttings();
+
   /* create gtab_list_window, etc */
   gtablist_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  if (hime_setup_window_type_utility)
+    gtk_window_set_type_hint(GTK_WINDOW(gtablist_window), GDK_WINDOW_TYPE_HINT_UTILITY);
   gtk_window_set_position(GTK_WINDOW(gtablist_window), GTK_WIN_POS_MOUSE);
 
   gtk_window_set_has_resize_grip(GTK_WINDOW(gtablist_window), FALSE);
- gtk_window_set_title (GTK_WINDOW (gtablist_window), _("輸入法選擇"));
+ gtk_window_set_title (GTK_WINDOW (gtablist_window), _("內定輸入法 & 開啟/關閉"));
   gtk_container_set_border_width (GTK_CONTAINER (gtablist_window), 1);
 
   g_signal_connect (G_OBJECT (gtablist_window), "destroy",
@@ -638,6 +646,13 @@ void create_gtablist_window (void)
   gtk_box_pack_start (GTK_BOX (hbox_hime_init_im_enabled),check_button_hime_init_im_enabled,  FALSE, FALSE, 0);
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_hime_init_im_enabled),
      hime_init_im_enabled);
+
+  GtkWidget *hbox_hime_init_full_mode = gtk_hbox_new (FALSE, 10);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox_hime_init_full_mode, FALSE, FALSE, 0);
+  check_button_hime_init_full_mode = gtk_check_button_new_with_label (_("直接進入全型輸入狀態"));
+  gtk_box_pack_start (GTK_BOX (hbox_hime_init_full_mode),check_button_hime_init_full_mode,  FALSE, FALSE, 0);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button_hime_init_full_mode),
+     hime_init_full_mode);
 
   GtkWidget *hbox_hime_shift_space_eng_full = gtk_hbox_new (FALSE, 10);
   gtk_box_pack_start (GTK_BOX (vbox), hbox_hime_shift_space_eng_full, FALSE, FALSE, 0);

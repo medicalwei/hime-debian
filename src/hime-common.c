@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -92,12 +92,6 @@ void exec_hime_setup()
   dbg("exec hime\n");
   if (geteuid() < 100 || getegid() < 100)
     return;
-
-#if 0
-  char pidstr[32];
-  sprintf(pidstr, "HIME_PID=%d", getpid());
-  putenv(pidstr);
-#endif
 
   system(HIME_BIN_DIR"/hime-setup &");
 }

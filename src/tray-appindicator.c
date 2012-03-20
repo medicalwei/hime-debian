@@ -25,6 +25,7 @@
 // TODO: win-kbm.c positioning
 
 extern void destroy_other_tray();
+gboolean is_exist_tray_appindicator();
 
 AppIndicator *tray_appindicator = NULL;
 void init_tray_appindicator();
@@ -61,12 +62,12 @@ void cb_toggle_im_enabled(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 static MITEM mitems[] = {
   {N_("開關輸入法"), NULL, cb_toggle_im_enabled, NULL},
   {N_("設定"), GTK_STOCK_PREFERENCES, exec_hime_setup_, NULL},
-  {N_("重新執行hime"), GTK_STOCK_QUIT, restart_hime, NULL},
+  {N_("結束hime"), GTK_STOCK_QUIT, restart_hime, NULL},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
-  {N_("外部繁轉簡工具"), NULL, cb_trad2sim, NULL},
-  {N_("外部簡轉繁工具"), NULL, cb_sim2trad, NULL},
+  {N_("繁轉簡工具"), NULL, cb_trad2sim, NULL},
+  {N_("簡轉繁工具"), NULL, cb_sim2trad, NULL},
   {N_("選擇輸入法"), NULL, cb_inmd_menu, NULL},
-  {N_("小鍵盤"), NULL, kbm_toggle_, &win_kbm_on},
+  {N_("小鍵盤"), NULL, kbm_toggle_, &hime_show_win_kbm},
   {N_("輸出成簡體"), NULL, cb_trad_sim_toggle_, &gb_output},
   {NULL, NULL, NULL, NULL}
 };
@@ -94,13 +95,15 @@ static gboolean tray_appindicator_load_icon(char fallback[], char iconfile[], ch
     strcpy(iconame, iconfile);
     iconame[strlen(iconame)-4] = 0;
     return icon_readable;
-  } else if (fallback != HIME_TRAY_PNG) { // iconpath does not exist, then fallback
+  } else if (strcmp(fallback, HIME_TRAY_PNG)) { // iconpath does not exist, then fallback
     strcpy(iconfile, fallback);
     return tray_appindicator_load_icon(HIME_TRAY_PNG, iconfile, iconame, icondir);
   } else {
     return FALSE;
   }
 }
+
+extern gboolean tsin_pho_mode();
 
 static void tray_appindicator_update_icon()
 {
@@ -127,10 +130,11 @@ static void tray_appindicator_update_icon()
 }
 
 static char st_gb[]=N_("/簡"), st_half[]=N_("半"), st_full[]=N_("全"), st_str[32];
+extern int current_shape_mode();
 static char * tray_appindicator_label_create()
 {
   strcpy(st_str, "");
-  if (current_CS && (current_CS->im_state == HIME_STATE_ENG_FULL || (current_CS->im_state != HIME_STATE_DISABLED && current_CS->b_half_full_char) || (current_method_type()==method_type_TSIN && tss.tsin_half_full)))
+  if (current_shape_mode())
     strcat(st_str, st_full);
   else
     strcat(st_str, st_half);
@@ -152,35 +156,32 @@ void load_tray_appindicator()
   tray_appindicator_update_icon();
 }
 
-static void cb_activate(GtkStatusIcon *status_icon, gpointer user_data)
-{
-  toggle_im_enabled();
-}
-
 gboolean tray_appindicator_create(gpointer data)
 {
   if (is_exist_tray_appindicator())
     return FALSE;
-  destroy_other_tray();
-  if (IS_APP_INDICATOR(tray_appindicator) && tray_appindicator) {
-    if (app_indicator_get_status (tray_appindicator) == APP_INDICATOR_STATUS_PASSIVE) {
-       app_indicator_set_status (tray_appindicator, APP_INDICATOR_STATUS_ACTIVE);
-       load_tray_appindicator();
+
+  if (tray_appindicator) {
+    if (app_indicator_get_status (tray_appindicator) != APP_INDICATOR_STATUS_ACTIVE) {
+      app_indicator_set_status (tray_appindicator, APP_INDICATOR_STATUS_ACTIVE);
+      destroy_other_tray();
     }
-    return FALSE;
+  } else {
+    destroy_other_tray();
+
+    if (!tray_appindicator_load_icon(HIME_TRAY_PNG, HIME_TRAY_PNG, iconame, icondir))
+      return FALSE;
+
+    tray_appindicator = app_indicator_new_with_path ("hime", iconame, APP_INDICATOR_CATEGORY_APPLICATION_STATUS, icondir);
+    app_indicator_set_status (tray_appindicator, APP_INDICATOR_STATUS_ACTIVE);
+    GtkWidget *menu = NULL;
+    menu = create_tray_menu(mitems);
+    app_indicator_set_secondary_activate_target(tray_appindicator, mitems[0].item);
+    app_indicator_set_menu (tray_appindicator, GTK_MENU (menu));
   }
-  
-  if (!tray_appindicator_load_icon(HIME_TRAY_PNG, HIME_TRAY_PNG, iconame, icondir))
-    return;
-  tray_appindicator = app_indicator_new_with_path ("hime", iconame, APP_INDICATOR_CATEGORY_APPLICATION_STATUS, icondir);
-  app_indicator_set_status (tray_appindicator, APP_INDICATOR_STATUS_ACTIVE);
-  GtkWidget *menu = NULL;
-  menu = create_tray_menu(mitems);
-  app_indicator_set_secondary_activate_target(tray_appindicator, mitems[0].item);
-  app_indicator_set_menu (tray_appindicator, GTK_MENU (menu));
 
   load_tray_appindicator();
-  return TRUE;
+  return FALSE;
 }
 
 
@@ -193,7 +194,7 @@ void destroy_tray_appindicator()
 
 gboolean is_exist_tray_appindicator()
 {
-  return tray_appindicator != NULL && app_indicator_get_status (tray_appindicator) == APP_INDICATOR_STATUS_ACTIVE;
+  return tray_appindicator != NULL && app_indicator_get_status (tray_appindicator) != APP_INDICATOR_STATUS_PASSIVE;
 }
 
 void init_tray_appindicator()

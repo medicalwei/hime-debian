@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -257,10 +257,23 @@ void set_sele_text(int tN, int i, char *text, int len)
   char ul[128];
   ul[0]=0;
 
+#if 0
   if (tss.sel_pho && i==tss.pho_menu_idx)
     strcpy(ul, " foreground=\"yellow\" background=\"black\"");
   else
-    sprintf(ul, "foreground=\"%s\"",hime_sel_key_color);
+    sprintf(ul, "foreground=\"%s\"", hime_sel_key_color);
+#endif
+  if (tss.sel_pho && i==tss.pho_menu_idx) {
+    if (hime_win_color_use)
+      sprintf(ul, "foreground=\"white\" background=\"%s\"", tsin_cursor_color);
+    else
+      strcpy(ul, "foreground=\"white\" background=\""TSIN_CURSOR_COLOR_DEFAULT"\"");
+  } else {
+    if (hime_win_color_use)
+      sprintf(ul, "foreground=\"%s\"", hime_sel_key_color);
+    else
+      strcpy(ul, "foreground=\""HIME_SEL_KEY_COLOR_DEFAULT"\"");
+  }
 
   sprintf(selma, "<span %s>%s</span>", ul, htmlspecialchars(cc, uu));
 

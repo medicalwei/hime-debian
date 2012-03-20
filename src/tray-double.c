@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,13 +18,8 @@
 #include "hime.h"
 #include "pho.h"
 #include "gtab.h"
-#include "eggtrayicon.h"
 #include <string.h>
-#if UNIX
 #include <signal.h>
-#else
-#include <process.h>
-#endif
 #include "gst.h"
 #include "pho-kbm-name.h"
 
@@ -32,7 +27,6 @@ extern void destroy_other_tray();
 
 gboolean tsin_pho_mode();
 extern int tsin_half_full;
-extern int win32_tray_disabled;
 extern gboolean gb_output;
 GtkStatusIcon *icon_main=NULL, *icon_state=NULL;
 
@@ -40,16 +34,6 @@ void get_icon_path(char *iconame, char fname[]);
 
 void cb_trad_sim_toggle();
 
-#if WIN32
-void cb_sim2trad(GtkCheckMenuItem *checkmenuitem, gpointer dat)
-{
-  win32exec("hime-sim2trad");
-}
-void cb_trad2sim(GtkCheckMenuItem *checkmenuitem, gpointer dat)
-{
-  win32exec("hime-trad2sim");
-}
-#else
 void cb_sim2trad(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   system(HIME_BIN_DIR"/hime-sim2trad &");
@@ -59,8 +43,6 @@ void cb_trad2sim(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
   system(HIME_BIN_DIR"/hime-trad2sim &");
 }
-#endif
-
 
 void cb_tog_phospeak(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
@@ -104,10 +86,10 @@ void exec_hime_setup_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
   exec_hime_setup();
 }
 
-void kbm_open_close(gboolean b_show);
+void kbm_open_close(GtkButton *checkmenuitem, gboolean b_show);
 void kbm_toggle_(GtkCheckMenuItem *checkmenuitem, gpointer dat)
 {
-  kbm_open_close(gtk_check_menu_item_get_active(checkmenuitem));
+  kbm_open_close(NULL, gtk_check_menu_item_get_active(checkmenuitem));
 }
 
 void create_about_window();
@@ -124,24 +106,14 @@ extern gboolean win_kbm_inited;
 extern gboolean win_kbm_on;
 
 static MITEM mitems_main[] = {
-  {N_("關於hime/常見問題"), GTK_STOCK_ABOUT, cb_about_window},
+  {N_("關於hime"), GTK_STOCK_ABOUT, cb_about_window},
   {N_("設定/工具"), GTK_STOCK_PREFERENCES, exec_hime_setup_},
-  {N_("重新執行hime"), GTK_STOCK_QUIT, restart_hime},
+  {N_("結束hime"), GTK_STOCK_QUIT, restart_hime},
   {N_("念出發音"), NULL, cb_tog_phospeak, &phonetic_speak},
-  {N_("小鍵盤"), NULL, kbm_toggle_, &win_kbm_on},
-#if UNIX
+  {N_("小鍵盤"), NULL, kbm_toggle_, &hime_show_win_kbm},
   {N_("選擇輸入法"), GTK_STOCK_INDEX, cb_inmd_menu, NULL},
-#endif
   {NULL}
 };
-
-#if WIN32
-void set_output_buffer_bak_to_clipboard();
-static void cb_set_output_buffer_bak_to_clipboard(GtkCheckMenuItem *checkmenuitem, gpointer dat)
-{
-  set_output_buffer_bak_to_clipboard();
-}
-#endif
 
 void load_setttings(), load_tab_pho_file();;
 void update_win_kbm();
@@ -162,13 +134,10 @@ static void cb_fast_phonetic_kbd_switch(GtkCheckMenuItem *checkmenuitem, gpointe
 
 static MITEM mitems_state[] = {
   {NULL, NULL, cb_fast_phonetic_kbd_switch},
-  {N_("外部繁轉簡工具"), NULL, cb_trad2sim},
-  {N_("外部簡轉繁工具"), NULL, cb_sim2trad},
+  {N_("繁轉簡工具"), NULL, cb_trad2sim},
+  {N_("簡轉繁工具"), NULL, cb_sim2trad},
   {N_("輸出成簡體"), NULL, cb_trad_sim_toggle_, &gb_output},
   {N_("打字速度統計"), NULL, cb_stat_toggle_, &stat_enabled},
-#if WIN32
-  {N_("送字到剪貼區"), NULL, cb_set_output_buffer_bak_to_clipboard},
-#endif
   {NULL}
 };
 
@@ -220,9 +189,9 @@ void update_item_active(MITEM *mitems)
       if (!item)
         continue;
 
-      g_signal_handler_block(item, mitems[i].handler);
+      if (mitems[i].handler) g_signal_handler_block(item, mitems[i].handler);
       gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), *mitems[i].check_dat);
-      g_signal_handler_unblock(item, mitems[i].handler);
+      if (mitems[i].handler) g_signal_handler_unblock(item, mitems[i].handler);
     }
 }
 
@@ -259,20 +228,17 @@ static void cb_popup(GtkStatusIcon *status_icon, guint button, guint activate_ti
 {
 //  dbg("cb_popup\n");
   switch (button) {
-#if UNIX
     case 1:
       toggle_im_enabled();
-
       break;
     case 2:
       kbm_toggle();
       break;
-#endif
     case 3:
 //      dbg("tray_menu %x\n", tray_menu);
       if (!tray_menu)
         tray_menu = create_tray_menu(mitems_main);
-#if 0
+#if 1
       gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, gtk_status_icon_position_menu, status_icon, button, activate_time);
 #else
       gtk_menu_popup(GTK_MENU(tray_menu), NULL, NULL, NULL, NULL, button, activate_time);
@@ -296,13 +262,10 @@ static void cb_activate_state(GtkStatusIcon *status_icon, gpointer user_data)
 static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activate_time, gpointer user_data)
 {
   switch (button) {
-
     case 1:
-#if UNIX
       toggle_im_enabled();
       break;
     case 2:
-#endif
       kbm_toggle();
       break;
     case 3:
@@ -328,13 +291,8 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
             unich_t tt[128];
             if (mitems_state[0].name)
               free(mitems_state[0].name);
-#if UNIX
             sprintf(tt, "注音換 %s %s", kbm_sel[i].name, p);
             mitems_state[0].name = strdup(tt);
-#else
-            swprintf(tt, L"注音換 %s %S", kbm_sel[i].name, p);
-            mitems_state[0].name = wcsdup(tt);
-#endif
           }
         }
 
@@ -348,7 +306,11 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
       if (!tray_menu_state)
         tray_menu_state = create_tray_menu(mitems_state);
 
+#if 1
+      gtk_menu_popup(GTK_MENU(tray_menu_state), NULL, NULL, gtk_status_icon_position_menu, status_icon, button, activate_time);
+#else
       gtk_menu_popup(GTK_MENU(tray_menu_state), NULL, NULL, NULL, NULL, button, activate_time);
+#endif
       break;
     }
   }
@@ -358,31 +320,16 @@ static void cb_popup_state(GtkStatusIcon *status_icon, guint button, guint activ
 
 
 #define HIME_TRAY_PNG "hime-tray.png"
-
+extern int current_shape_mode();
 
 void load_tray_icon_double()
 {
   if (!hime_status_tray)
     return;
-  if (hime_tray_display != HIME_TRAY_DISPLAY_DOUBLE)
-    return;
 
-#if WIN32
-  // when login, creating icon too early may cause block in gtk_status_icon_new_from_file
-  if (win32_tray_disabled)
-    return;
-#endif
-
-  destroy_other_tray();
-
-//  dbg("load_tray_icon_win32\n");
-#if UNIX
+//  dbg("load_tray_icon_double\n");
   char *tip;
   tip="";
-#else
-  wchar_t *tip;
-  tip=L"";
-#endif
 
   char *iconame;
   if (!current_CS || current_CS->im_state == HIME_STATE_DISABLED||current_CS->im_state == HIME_STATE_ENG_FULL) {
@@ -417,9 +364,7 @@ void load_tray_icon_double()
 
 //  dbg("%d %d\n",current_CS->im_state,current_CS->b_half_full_char);
 
-  if (current_CS && (current_CS->im_state == HIME_STATE_ENG_FULL ||
-      (current_CS->im_state != HIME_STATE_DISABLED && current_CS->b_half_full_char) ||
-      (current_method_type()==method_type_TSIN && tss.tsin_half_full))) {
+  if (current_shape_mode()) {
       if (gb_output) {
         icon_st="full-simp.png";
         tip = _("全形/簡體輸出");
@@ -448,6 +393,7 @@ void load_tray_icon_double()
     gtk_status_icon_set_from_file(icon_state, fname_state);
   }
   else {
+    destroy_other_tray();
 //    dbg("gtk_status_icon_new_from_file a\n");
     icon_main = gtk_status_icon_new_from_file(fname);
     g_signal_connect(G_OBJECT(icon_main),"activate", G_CALLBACK (cb_activate), NULL);
@@ -489,7 +435,7 @@ gboolean is_exist_tray_double()
 gboolean create_tray_double(gpointer data)
 {
   load_tray_icon_double();
-  return TRUE;
+  return FALSE;
 }
 
 void init_tray_double()

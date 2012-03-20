@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,21 +31,7 @@ void p_err(char *fmt,...)
   vsprintf(out, fmt, args);
   va_end(args);
 
-#if CLIENT_LIB
   fprintf(stderr, "%s\n", out);
-#else
-  if (getenv("NO_GTK_INIT"))
-    fprintf(stderr, "%s\n", out);
-  else {
-    GtkWidget *dialog = gtk_message_dialog_new (NULL, GTK_DIALOG_MODAL,
-                                     GTK_MESSAGE_ERROR,
-                                     GTK_BUTTONS_CLOSE,
-                                     "%s", out);
-
-    gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-  }
-#endif
 
 #if DEBUG && 1
   abort();
@@ -62,7 +48,7 @@ static void init_out_fp()
   if (!out_fp) {
     if (getenv("HIME_DBG_TMP") || 0) {
       char fname[64];
-      sprintf(fname, "/tmp/himedbg-%d-%d", getuid(), getpid());
+      sprintf(fname, "%s/himedbg-%d-%d", g_get_tmp_dir(), getuid(), getpid());
       out_fp = fopen(fname, "w");
     }
 

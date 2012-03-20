@@ -1,9 +1,9 @@
-/* Copyright (C) 1995-2011 Edward Liu, Hsin-Chu, Taiwan
+/* Copyright (C) 1995-2011 Edward Der-Hua Liu, Hsin-Chu, Taiwan
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,6 @@
 #include "hime.h"
 #include "gtab.h"
 #include "hime-endian.h"
-#include "hime-version.h"
 
 FILE *fr, *fw;
 int lineno;
@@ -183,9 +182,6 @@ int main(int argc, char **argv)
   int *phridx=NULL, phr_cou=0;
   char *phrbuf = NULL;
   int prbf_cou=0;
-
-  if (!getenv("NO_GTK_INIT"))
-    gtk_init(&argc, &argv);
 
   printf("-- cin2gtab encoding UTF-8 --\n");
   printf("--- please use iconv -f big5 -t utf-8 if your file is in big5 encoding\n");

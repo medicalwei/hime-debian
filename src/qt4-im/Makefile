@@ -14,11 +14,11 @@ all:    im-hime.so
 
 .cpp.o:
 	@echo "  $< -> $@"
-	@$(CXX) -c -o $@ $(CXXFLAGS) $(INCS) $<
+	@$(CXX) -c -o $@ $(CXXFLAGS) $<
 
 moc_hime-qt.cpp:	hime-qt.h
 	@echo "  $< -> $@"
-	$(QT4_MOC_PATH) $< -o moc_hime-qt.cpp
+	@$(QT4_MOC_PATH) $< -o moc_hime-qt.cpp
 
 im-hime.so: $(OBJS)
 	@echo "linking $@ ..."
@@ -27,8 +27,8 @@ im-hime.so: $(OBJS)
 	@rm -f core.*
 
 install:
-	install -d $(DESTDIR)/$(QT4_IM_DIR); \
-	install -m 755 im-hime.so $(DESTDIR)/$(QT4_IM_DIR)
+	install -d $(QT4_IM_DIR); \
+	install -m 755 im-hime.so $(QT4_IM_DIR)
 
 clean:
 	@echo "clean up"

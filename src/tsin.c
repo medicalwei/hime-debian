@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -396,7 +396,10 @@ void flush_tsin_buffer()
 }
 
 
-void disp_tsin_eng_pho(int eng_pho), disp_tray_icon();
+void disp_tsin_eng_pho(int eng_pho);
+#if TRAY_ENABLED
+void disp_tray_icon();
+#endif
 
 void show_tsin_stat()
 {
@@ -1606,7 +1609,13 @@ int feedkey_pp(KeySym xkey, int kbstate)
         if (shift_m) {
           if (!tss.c_len)
             return 0;
-          tsin_create_win_save_phrase(tss.c_idx,  tss.c_len - tss.c_idx);
+          int idx0 = tss.c_idx;
+          if (tss.c_len == tss.c_idx)
+            idx0 = 0;
+          int len = tss.c_len - idx0;
+          if (len > MAX_PHRASE_LEN)
+            return 0;
+          tsin_create_win_save_phrase(idx0, len);
           move_cursor_end();
           return 1;
         } else {
@@ -1701,10 +1710,14 @@ tab_phrase_end:
        N = phrase_count + pho_count - tss.current_page;
        if (N > phkbm.selkeyN)
          N = phkbm.selkeyN;
-       tss.pho_menu_idx--;
-       if (tss.pho_menu_idx < 0)
-         tss.pho_menu_idx = N-1;
-       disp_current_sel_page();
+       if (tss.pho_menu_idx == 0)
+         tsin_page_up();
+       else {
+         tss.pho_menu_idx--;
+         if (tss.pho_menu_idx < 0)
+           tss.pho_menu_idx = N-1;
+         disp_current_sel_page();
+       }
        return 1;
      case XK_Prior:
      case XK_KP_Prior:
@@ -1758,12 +1771,12 @@ change_char:
        if (!tss.sel_pho) {
          open_select_pho();
        } else {
-         if (xkey == XK_space)
+         int N = phrase_count + pho_count - tss.current_page;
+         if (N > phkbm.selkeyN)
+           N = phkbm.selkeyN;
+         if (tss.pho_menu_idx == N-1 || xkey == XK_space)
            tsin_page_down();
          else {
-           int N = phrase_count + pho_count - tss.current_page;
-           if (N > phkbm.selkeyN)
-             N = phkbm.selkeyN;
            tss.pho_menu_idx = (tss.pho_menu_idx+1) % N;
            disp_current_sel_page();
          }

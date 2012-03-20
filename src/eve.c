@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,10 +17,8 @@
 
 #include "hime.h"
 #include "gtab.h"
-#if UNIX
 #include <signal.h>
 #include <X11/extensions/XTest.h>
-#endif
 #include "gst.h"
 #include "pho.h"
 #include "im-client/hime-im-client-attr.h"
@@ -36,6 +34,11 @@ extern XIMS current_ims;
 static IMForwardEventStruct *current_forward_eve;
 #endif
 extern gboolean win_kbm_inited;
+extern int hime_show_win_kbm;
+extern gboolean win_kbm_on;
+void show_win_kbm();
+void hide_win_kbm();
+void update_win_kbm();
 
 static char *callback_str_buffer;
 Window focus_win;
@@ -44,51 +47,32 @@ char *output_buffer;
 int output_bufferN;
 static char *output_buffer_raw, *output_buffer_raw_bak;
 static int output_buffer_rawN;
-#if WIN32
-gboolean test_mode;
-int last_input_method;
-#endif
 void set_wselkey(char *s);
 void gtab_set_win1_cb();
 void toggle_symbol_table();
 
 gboolean old_capslock_on;
 
+#if TRAY_ENABLED
 int hime_tray_display;
+#endif
 void init_gtab(int inmdno);
 
 char current_method_type()
 {
 //  dbg("default_input_method %d\n",default_input_method);
   if (!current_CS)
-#if UNIX
     return inmd[default_input_method].method_type;
-#else
-  {
-    if (!last_input_method)
-      last_input_method = default_input_method;
-    return inmd[last_input_method].method_type;
-  }
-#endif
 
 //  dbg("current_CS->in_method %d\n", current_CS->in_method);
   return inmd[current_CS->in_method].method_type;
 }
 
-
-#if WIN32
-void win32_FakeKey(UINT vk, bool key_pressed);
-#endif
 void send_fake_key_eve(KeySym key)
 {
-#if WIN32
-  win32_FakeKey(key, true);
-  win32_FakeKey(key, false);
-#else
   KeyCode kc = XKeysymToKeycode(dpy, key);
   XTestFakeKeyEvent(dpy, kc, True, CurrentTime);
   XTestFakeKeyEvent(dpy, kc, False, CurrentTime);
-#endif
 }
 
 void fake_shift()
@@ -133,7 +117,6 @@ static ClientState temp_CS;
 
 void save_CS_current_to_temp()
 {
-#if UNIX
   if (!hime_single_state)
     return;
 
@@ -142,13 +125,11 @@ void save_CS_current_to_temp()
   temp_CS.im_state = current_CS->im_state;
   temp_CS.in_method = current_CS->in_method;
   temp_CS.tsin_pho_mode = current_CS->tsin_pho_mode;
-#endif
 }
 
 
 void save_CS_temp_to_current()
 {
-#if UNIX
   if (!hime_single_state)
     return;
 
@@ -157,9 +138,18 @@ void save_CS_temp_to_current()
   current_CS->im_state = temp_CS.im_state;
   current_CS->in_method = temp_CS.in_method;
   current_CS->tsin_pho_mode = temp_CS.tsin_pho_mode;
-#endif
 }
 
+int current_shape_mode()
+{
+// INFO: 1: Full 0: Half / Error: !current_CS
+  return current_CS &&
+    (
+      current_CS->im_state == HIME_STATE_ENG_FULL ||
+      (current_CS->im_state != HIME_STATE_DISABLED && current_method_type()!=method_type_TSIN && current_CS->b_half_full_char) ||
+      (current_CS->im_state == HIME_STATE_CHINESE && current_method_type()==method_type_TSIN && tss.tsin_half_full)
+    );
+}
 
 gboolean init_in_method(int in_no);
 
@@ -210,11 +200,6 @@ void add_ch_time_str(char *s);
 
 void send_text(char *text)
 {
-#if WIN32
-  if (test_mode)
-    return;
-#endif
-
   char *filter;
 
   if (!text)
@@ -233,7 +218,6 @@ void send_text(char *text)
   }
 
 //direct:
-#if UNIX
   filter = getenv("HIME_OUTPUT_FILTER");
   char filter_text[512];
 
@@ -280,7 +264,6 @@ void send_text(char *text)
     }
 
   }
-#endif
 next:
   if (len) {
     append_str(&output_buffer, &output_bufferN, text, len);
@@ -293,26 +276,6 @@ void send_output_buffer_bak()
 {
   send_text(output_buffer_raw_bak);
 }
-
-#if WIN32
-void set_output_buffer_bak_to_clipboard()
-{
-  char *text, *utf8_gbtext=NULL;
-
-  if (gb_output) {
-    trad2sim(output_buffer_raw_bak, strlen(output_buffer_raw_bak),
-      &utf8_gbtext);
-    text = utf8_gbtext;
-  } else
-    text = output_buffer_raw_bak;
-
-  GtkClipboard *pclipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-
-  gtk_clipboard_set_text(pclipboard, text, -1);
-
-  free(utf8_gbtext);
-}
-#endif
 
 void send_utf8_ch(char *bchar)
 {
@@ -412,11 +375,13 @@ void hide_in_win(ClientState *cs)
 
   switch (current_method_type()) {
     case method_type_PHO:
+      hide_win_kbm();
       hide_win_pho();
       break;
 #if USE_TSIN
     case method_type_TSIN:
 //      flush_tsin_buffer();
+      hide_win_kbm();
       hide_win0();
       break;
 #endif
@@ -434,7 +399,9 @@ void hide_in_win(ClientState *cs)
 void show_win_pho();
 void show_win0();
 void show_win_gtab();
+#if TRAY_ENABLED
 void disp_tray_icon();
+#endif
 
 void check_CS()
 {
@@ -488,6 +455,16 @@ void show_in_win(ClientState *cs)
       show_input_method_name_on_gtab();
       break;
   }
+
+  if (hime_show_win_kbm &&
+      (current_CS->im_state == HIME_STATE_CHINESE) &&
+      (current_method_type() != method_type_MODULE) &&
+      (current_method_type() != method_type_SYMBOL_TABLE))
+  {
+    show_win_kbm();
+    update_win_kbm();
+  }
+
 #if 0
   show_win_stautus();
 #endif
@@ -539,12 +516,11 @@ void move_in_win(ClientState *cs, int x, int y)
       move_win_gtab(x, y);
   }
 }
-#if UNIX
+
 static int xerror_handler(Display *d, XErrorEvent *eve)
 {
   return 0;
 }
-#endif
 
 void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 {
@@ -554,17 +530,10 @@ void getRootXY(Window win, int wx, int wy, int *tx, int *ty)
 	return;
   }
 
-#if WIN32
-  POINT pt;
-  pt.x = wx; pt.y = wy;
-  ClientToScreen((HWND)win, &pt);
-  *tx = pt.x; *ty=pt.y;
-#else
   Window ow;
   XErrorHandler olderr = XSetErrorHandler((XErrorHandler)xerror_handler);
   XTranslateCoordinates(dpy,win,root,wx,wy,tx,ty,&ow);
   XSetErrorHandler(olderr);
-#endif
 }
 
 
@@ -574,12 +543,12 @@ void move_IC_in_win(ClientState *cs)
    dbg("move_IC_in_win %d,%d\n", cs->spot_location.x, cs->spot_location.y);
 #endif
    Window inpwin = cs->client_win;
-#if UNIX
+
    if (!inpwin) {
      dbg("no inpwin\n");
      return;
    }
-#endif
+
    // non focus win filtering is done in the client lib
    if (inpwin != focus_win && focus_win && !cs->b_hime_protocol) {
       return;
@@ -588,7 +557,6 @@ void move_IC_in_win(ClientState *cs)
    int inpx = cs->spot_location.x;
    int inpy = cs->spot_location.y;
 
-#if UNIX
    XWindowAttributes att;
    XGetWindowAttributes(dpy, inpwin, &att);
 // chrome window is override_redirect
@@ -599,17 +567,6 @@ void move_IC_in_win(ClientState *cs)
      inpx = att.width - 1;
    if (inpy >= att.height)
      inpy = att.height - 1;
-#else
-   if (inpwin) {
-     RECT rect;
-     GetClientRect((HWND)inpwin, &rect);
-     if (inpx >= rect.right)
-       inpx = rect.right - 1;
-     if (inpy >= rect.bottom)
-       inpy = rect.bottom - 1;
-   }
-//   dbg("GetClientRect %x %d,%d\n", inpwin, inpx, inpy);
-#endif
    int tx,ty;
    getRootXY(inpwin, inpx, inpy, &tx, &ty);
 
@@ -628,7 +585,6 @@ void update_in_win_pos()
 //  dbg("update_in_win_pos %x %d\n", current_CS, current_CS->input_style);
 
   if (current_CS->input_style == InputStyleRoot) {
-#if UNIX
     Window r_root, r_child;
     int winx, winy, rootx, rooty;
     u_int mask;
@@ -650,12 +606,6 @@ void update_in_win_pos()
       current_CS->spot_location.x = tx;
       current_CS->spot_location.y = ty;
     }
-#else
-	  int winx=0, winy=0;
-      current_CS->spot_location.x = 0;
-      current_CS->spot_location.y = 0;
-#endif
-
     move_in_win(current_CS, winx, winy);
   } else {
     move_IC_in_win(current_CS);
@@ -665,7 +615,8 @@ void update_in_win_pos()
 void win_pho_disp_half_full();
 void win_tsin_disp_half_full();
 void win_gtab_disp_half_full();
-void update_tray_icon(), load_tray_icon(), load_tray_icon_double();
+#if TRAY_ENABLED
+void load_tray_icon(), load_tray_icon_double();
 #if TRAY_UNITY
 void load_tray_appindicator();
 #endif
@@ -677,6 +628,7 @@ extern void destroy_tray_double();
 gboolean is_exist_tray_appindicator();
 extern void destroy_tray_appindicator();
 #endif
+#endif //TRAY_ENABLED
 
 #if TRAY_ENABLED
 void destroy_tray()
@@ -759,19 +711,12 @@ void init_state_chinese(ClientState *cs)
   cs->im_state = HIME_STATE_CHINESE;
   set_tsin_pho_mode0(cs);
   if (!cs->in_method)
-#if UNIX
     init_in_method(default_input_method);
-#else
-  if (!last_input_method)
-    last_input_method = default_input_method;
-  init_in_method(last_input_method);
-#endif
 
   save_CS_current_to_temp();
 }
 
 gboolean output_gbuf();
-void update_win_kbm();
 
 // <Ctrl><Space> is pressed
 void toggle_im_enabled()
@@ -798,7 +743,8 @@ void toggle_im_enabled()
       }
       else if (current_method_type () == method_type_MODULE)
       {
-          module_cb ()->module_flush_input ();
+	  HIME_module_callback_functions *mod_cbs = module_cb();
+	  if (mod_cbs) mod_cbs->module_flush_input();
       }
       else {
         output_gbuf();
@@ -811,8 +757,6 @@ void toggle_im_enabled()
 #endif
       current_CS->im_state = HIME_STATE_DISABLED;
 
-      update_win_kbm();
-
 #if TRAY_ENABLED
       disp_tray_icon();
 #endif
@@ -820,18 +764,22 @@ void toggle_im_enabled()
       if (!current_method_type())
         init_gtab(current_CS->in_method);
 
-
       init_state_chinese(current_CS);
       reset_current_in_win_xy();
 #if 1
-      show_in_win(current_CS);
+      if ((inmd[current_CS->in_method].flag & FLAG_GTAB_SYM_KBM))
+      {
+        win_kbm_inited = 1;
+        show_win_kbm();
+      }
+      else
+        show_in_win(current_CS);
+
       update_in_win_pos();
 #else
       update_in_win_pos();
       show_in_win(current_CS);
 #endif
-
-      update_win_kbm();
 
 #if TRAY_ENABLED
       disp_tray_icon();
@@ -869,7 +817,7 @@ void update_active_in_win_geom()
   }
 }
 
-extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab;
+extern GtkWidget *gwin_pho, *gwin0, *gwin_gtab, *gwin_sym;
 
 gboolean win_is_visible()
 {
@@ -886,6 +834,8 @@ gboolean win_is_visible()
       if (!module_cb())
         return FALSE;
       return module_cb()->module_win_visible();
+    case method_type_SYMBOL_TABLE:
+      return gwin_sym && GTK_WIDGET_VISIBLE(gwin_sym);
     default:
       if (!gwin_gtab)
         return FALSE;
@@ -902,11 +852,6 @@ void tsin_toggle_half_full();
 // <Shift><Space> is pressed
 void toggle_half_full_char()
 {
-#if WIN32
-  if (test_mode)
-    return;
-#endif
-
   check_CS();
 
   if (!hime_shift_space_eng_full) {
@@ -929,9 +874,14 @@ void toggle_half_full_char()
         hide_in_win(current_CS);
 	break;
       case HIME_STATE_DISABLED:
-        toggle_im_enabled();
-        current_CS->im_state = HIME_STATE_ENG_FULL;
+      {
+	gint show_win_kbm = hime_show_win_kbm;
+	hime_show_win_kbm = FALSE;
+	toggle_im_enabled();
+	current_CS->im_state = HIME_STATE_ENG_FULL;
+	hime_show_win_kbm = show_win_kbm;
 	break;
+      }
       case HIME_STATE_CHINESE:
         current_CS->b_half_full_char = !current_CS->b_half_full_char;
 	break;
@@ -948,11 +898,6 @@ void toggle_half_full_char()
 void init_tab_pp(gboolean init);
 void init_tab_pho();
 
-
-extern int b_show_win_kbm;
-
-void hide_win_kbm();
-void show_win_kbm();
 extern char *TableDir;
 void set_gtab_input_method_name(char *s);
 HIME_module_callback_functions *init_HIME_module_callback_functions(char *sofile);
@@ -990,11 +935,7 @@ gboolean init_in_method(int in_no)
 
       hide_in_win(current_CS);
     }
-
-    if (cur_inmd && (cur_inmd->flag & FLAG_GTAB_SYM_KBM))
-      hide_win_kbm();
   }
-
 
   reset_current_in_win_xy();
 
@@ -1044,29 +985,59 @@ gboolean init_in_method(int in_no)
     {
       if (current_CS && current_CS->im_state==HIME_STATE_CHINESE)
         toggle_im_enabled();
+      current_CS->in_method = in_no;
+      hide_win_kbm();
       return TRUE;
     }
     default:
       init_gtab(in_no);
       if (!inmd[in_no].DefChars)
         return FALSE;
-      current_CS->in_method = in_no;
-      if (!(inmd[in_no].flag & FLAG_GTAB_SYM_KBM)) {
-        show_win_gtab();
-	show_input_method_name_on_gtab();
+      if (inmd[in_no].flag & FLAG_GTAB_SYM_KBM) {
+	if (win_kbm_on)
+	{
+          init_in_method(default_input_method);
+	  hide_win_kbm();
+	}
+	else
+	{
+          // Show SYM_KBM
+          hide_in_win(current_CS);
+          win_kbm_inited = 1;
+          show_win_kbm();
+          current_CS->in_method = in_no;
+	}
       }
       else {
-        win_kbm_inited = 1;
-        show_win_kbm();
+	// in case WIN_SYN and SYM_KBM show at the same time.
+        current_CS->in_method = in_no;
+        hide_win_sym();
+        win_sym_enabled=0;
+
+        show_win_gtab();
+	show_input_method_name_on_gtab();
       }
 
       // set_gtab_input_method_name(inmd[in_no].cname);
       break;
   }
-#if WIN32
-  if (current_CS && current_CS->in_method != last_input_method)
-    last_input_method = current_CS->in_method;
-#endif
+
+  if (hime_init_full_mode)
+  {
+    switch (current_method_type())
+    {
+      case method_type_TSIN:
+        if (tss.tsin_half_full==0) toggle_half_full_char();
+        break;
+      case method_type_MODULE:
+      case method_type_SYMBOL_TABLE:
+      case method_type_EN:
+        break;
+      default:
+        if (current_CS->b_half_full_char==0) toggle_half_full_char();
+        break;
+    }
+  }
 
 #if TRAY_ENABLED
   disp_tray_icon();
@@ -1081,22 +1052,42 @@ gboolean init_in_method(int in_no)
   update_in_win_pos();
   update_win_kbm_inited();
 
+  if (hime_show_win_kbm)
+  {
+    if ((current_CS->im_state == HIME_STATE_ENG_FULL) ||
+        (current_method_type() == method_type_MODULE) ||
+        (current_method_type() == method_type_SYMBOL_TABLE))
+      hide_win_kbm();
+    else
+    {
+      show_win_kbm();
+      update_win_kbm();
+    }
+  }
+
   return TRUE;
 }
 
 
 static void cycle_next_in_method()
 {
-  int i;
-#if WIN32
-  if (test_mode)
-    return;
-#endif
+//  int im_state = current_CS->im_state;
 
+  if (current_method_type() == method_type_SYMBOL_TABLE)
+  {
+    hide_win_sym();
+    win_sym_enabled=0;
+  }
+
+  int i;
   for(i=0; i < inmdN; i++) {
     int v = (current_CS->in_method + 1 + i) % inmdN;
+    if (win_sym_enabled && inmd[v].method_type == method_type_SYMBOL_TABLE)
+      continue;
+
     if (!inmd[v].in_cycle)
       continue;
+
     if (!inmd[v].cname || !inmd[v].cname[0])
       continue;
 
@@ -1127,7 +1118,7 @@ gboolean full_char_proc(KeySym keysym)
     return 1;
   }
 
-  if ((current_method_type() == method_type_TSIN) && 
+  if ((current_method_type() == method_type_TSIN) &&
       (current_CS->im_state == HIME_STATE_CHINESE))
     add_to_tsin_buf_str(tt);
   else
@@ -1172,7 +1163,7 @@ gboolean get_caps_lock_state()
 
 void disp_win_kbm_capslock()
 {
-  if (!b_show_win_kbm)
+  if (!hime_show_win_kbm)
     return;
 
   gboolean o_state = old_capslock_on;
@@ -1191,7 +1182,7 @@ void disp_win_kbm_capslock_init()
   old_capslock_on = gdk_keymap_get_caps_lock_state(gdk_keymap_get_default());
 //  dbg("disp_win_kbm_capslock_init %d\n",old_capslock_on);
 
-  if (b_show_win_kbm)
+  if (hime_show_win_kbm)
     win_kbm_disp_caplock();
 }
 
@@ -1212,6 +1203,8 @@ void toggle_symbol_table()
       show_in_win(current_CS);
     force_show = FALSE;
   }
+
+  hide_win_kbm();
 }
 
 void destroy_phrase_save_menu();
@@ -1231,11 +1224,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   if (current_CS->client_win)
     focus_win = current_CS->client_win;
 
-  if (
-#if WIN32
-  !test_mode &&
-#endif
-  callback_str_buffer && strlen(callback_str_buffer)) {
+  if (callback_str_buffer && strlen(callback_str_buffer)) {
     send_text(callback_str_buffer);
     callback_str_buffer[0]=0;
     return TRUE;
@@ -1262,11 +1251,7 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       }
 
       toggle_im_enabled();
-#if UNIX
       return TRUE;
-#else
-      return FALSE;
-#endif
     }
   }
 
@@ -1288,11 +1273,6 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
   }
 
 //  dbg("state %x\n", kev_state);
-  if (current_CS->im_state == HIME_STATE_ENG_FULL) {
-    return full_char_proc(keysym);
-  }
-
-
   if ((kev_state & ControlMask) && (kev_state&(Mod1Mask|Mod5Mask))) {
     if (keysym == 'g' || keysym == 'r') {
       send_output_buffer_bak();
@@ -1315,28 +1295,29 @@ gboolean ProcessKeyPress(KeySym keysym, u_int kev_state)
       return FALSE;
 
     current_CS->im_state = HIME_STATE_CHINESE;
-#if WIN32
-    if (!test_mode)
-#endif
-      init_in_method(kidx);
+    init_in_method(kidx);
 
     return TRUE;
   }
 
   last_keysym = keysym;
 
-  if (current_CS->im_state == HIME_STATE_DISABLED) {
+  if (current_CS->im_state == HIME_STATE_ENG_FULL && !(kev_state & (ControlMask|Mod1Mask))) {
+    return full_char_proc(keysym);
+  }
+
+  if (current_CS->im_state == HIME_STATE_DISABLED || current_CS->im_state == HIME_STATE_ENG_FULL) {
     return FALSE;
   }
 
   if (!current_CS->b_hime_protocol) {
-  if (((keysym == XK_Control_L || keysym == XK_Control_R)
-                   && (kev_state & ShiftMask)) ||
-      ((keysym == XK_Shift_L || keysym == XK_Shift_R)
-                   && (kev_state & ControlMask))) {
-     cycle_next_in_method();
-     return TRUE;
-  }
+    if (((keysym == XK_Control_L || keysym == XK_Control_R)
+                     && (kev_state & ShiftMask)) ||
+        ((keysym == XK_Shift_L || keysym == XK_Shift_R)
+                     && (kev_state & ControlMask))) {
+       cycle_next_in_method();
+       return TRUE;
+    }
   }
 
   if (current_CS->b_raise_window && keysym>=' ' && keysym < 127) {
@@ -1381,8 +1362,7 @@ gboolean ProcessKeyRelease(KeySym keysym, u_int kev_state)
   dbg_time("key release %x %x\n", keysym, kev_state);
 #endif
 
-  if (current_CS->im_state == HIME_STATE_DISABLED)
-    return FALSE;
+ if (current_CS->im_state == HIME_STATE_DISABLED || current_CS->im_state == HIME_STATE_ENG_FULL) return FALSE;
 
 #if 1
   if (current_CS->b_hime_protocol && (last_keysym == XK_Shift_L ||
@@ -1446,7 +1426,6 @@ int xim_ForwardEventHandler(IMForwardEventStruct *call_data)
 }
 #endif
 
-#if UNIX
 int skip_window(Window win)
 {
   XWindowAttributes att;
@@ -1460,7 +1439,6 @@ int skip_window(Window win)
 
   return 0;
 }
-#endif
 
 void hime_reset();
 
@@ -1469,7 +1447,7 @@ int hime_FocusIn(ClientState *cs)
 //  dbg("hime_FocusIn\n");
   Window win = cs->client_win;
 
-#if UNIX && 0
+#if 0
   if (skip_window(win))
     return FALSE;
 #endif
@@ -1556,7 +1534,7 @@ int hime_FocusOut(ClientState *cs)
   if (cs != current_CS)
      return FALSE;
 
-#if UNIX && 0
+#if 0
 //  dbg("hime_FocusOut\n");
   if (skip_window(cs->client_win))
     return FALSE;
@@ -1670,10 +1648,6 @@ int xim_hime_FocusOut(IMChangeFocusStruct *call_data)
 
 gboolean hime_edit_display_ap_only()
 {
-#if WIN32
-  if (test_mode)
-    return TRUE;
-#endif
   if (!current_CS)
     return FALSE;
 //  dbg("hime_edit_display_ap_only %d\n", current_CS->use_preedit)
@@ -1714,72 +1688,18 @@ void flush_edit_buffer()
 #endif
 }
 
-#if WIN32
-void pho_save_gst(), tsin_save_gst(), gtab_save_gst();
-void pho_restore_gst(), tsin_restore_gst(), gtab_restore_gst();
-
-gboolean ProcessTestKeyPress(KeySym keysym, u_int kev_state)
+void change_module_font_size()
 {
-  if (!current_CS)
-    return TRUE;
-//  dbg("hime_reset\n");
-  gboolean v;
-
-  test_mode= TRUE;
-  switch(current_method_type()) {
-    case method_type_PHO:
-      pho_save_gst();
-      v = ProcessKeyPress(keysym, kev_state);
-      pho_restore_gst();
-      break;
-    case method_type_TSIN:
-      tsin_save_gst();
-      v = ProcessKeyPress(keysym, kev_state);
-      tsin_restore_gst();
-      break;
-    case method_type_MODULE:
-      break;
-    default:
-      gtab_save_gst();
-      v = ProcessKeyPress(keysym, kev_state);
-      gtab_restore_gst();
+  int i;
+  for (i=0; i < inmdN; i++) {
+    INMD *pinmd = &inmd[i];
+    if (pinmd->method_type != method_type_MODULE || pinmd->disabled)
+      continue;
+    HIME_module_callback_functions *f = pinmd->mod_cb_funcs;
+    if (!f)
+      continue;
+    if (!f->module_change_font_size)
+      continue;
+    f->module_change_font_size();
   }
-
-  test_mode= FALSE;
-
-  return v;
 }
-
-
-gboolean Process2KeyPress(KeySym keysym, u_int kev_state)
-{
-  gboolean tv = ProcessTestKeyPress(keysym, kev_state);
-  gboolean v = ProcessKeyPress(keysym, kev_state);
-
-  if (tv != v)
-    dbg("ProcessKeyPress %x -> %d %d\n",keysym, tv, v);
-
-  return v;
-}
-
-
-gboolean ProcessTestKeyRelease(KeySym keysym, u_int kev_state)
-{
-  test_mode = TRUE;
-  gboolean v = ProcessKeyRelease(keysym, kev_state);
-  test_mode = FALSE;
-  return v;
-}
-
-
-gboolean Process2KeyRelease(KeySym keysym, u_int kev_state)
-{
-  gboolean tv = ProcessTestKeyRelease(keysym, kev_state);
-  gboolean v = ProcessKeyRelease(keysym, kev_state);
-
-  if (tv != v)
-    dbg("ProcessKeyRelease %x -> %d %d\n",keysym, tv, v);
-
-  return v;
-}
-#endif

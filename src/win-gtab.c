@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -158,12 +158,24 @@ void change_win_bg(GtkWidget *win)
 
 void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
 {
+  if (win)
+    change_win_bg(win);
+// TODO: Simplify repeating codes below.
   if (!hime_win_color_use) {
-    if (label)
 #if !GTK_CHECK_VERSION(2,91,6)
+    if (label)
       gtk_widget_modify_fg(label, GTK_STATE_NORMAL, NULL);
+    if (label_edit)
+      gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, NULL);
+    if (label_gtab_pre_sel)
+      gtk_widget_modify_fg(label_gtab_pre_sel, GTK_STATE_NORMAL, NULL);
 #else
+    if (label)
       gtk_widget_override_color(label, GTK_STATE_FLAG_NORMAL, NULL);
+    if (label_edit)
+      gtk_widget_override_color(label_edit, GTK_STATE_FLAG_NORMAL, NULL);
+    if (label_gtab_pre_sel)
+      gtk_widget_override_color(label_gtab_pre_sel, GTK_STATE_FLAG_NORMAL, NULL);
 #endif
     return;
   }
@@ -175,6 +187,8 @@ void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
     gtk_widget_modify_fg(label, GTK_STATE_NORMAL, &col);
   if (label_edit)
     gtk_widget_modify_fg(label_edit, GTK_STATE_NORMAL, &col);
+  if (label_gtab_pre_sel)
+    gtk_widget_modify_fg(label_gtab_pre_sel, GTK_STATE_NORMAL, &col);
 #else
   GdkRGBA rgbfg;
   gdk_rgba_parse(&rgbfg, gdk_color_to_string(&col));
@@ -182,9 +196,9 @@ void change_win_fg_bg(GtkWidget *win, GtkWidget *label)
     gtk_widget_override_color(label, GTK_STATE_FLAG_NORMAL, &rgbfg);
   if (label_edit)
     gtk_widget_override_color(label_edit, GTK_STATE_FLAG_NORMAL, &rgbfg);
+  if (label_gtab_pre_sel)
+    gtk_widget_override_color(label_gtab_pre_sel, GTK_STATE_FLAG_NORMAL, &rgbfg);
 #endif
-
-  change_win_bg(win);
 }
 
 
@@ -459,6 +473,8 @@ void create_win_gtab_gui_simple()
   }
 
   gtk_container_set_border_width (GTK_CONTAINER (event_box_gtab), 0);
+
+  if (gwin_gtab==NULL) create_win_gtab();
 
   if (hime_inner_frame) {
     GtkWidget *frame = top_bin = gtk_frame_new(NULL);
@@ -739,6 +755,8 @@ void destroy_win_gtab()
   gwin_gtab = NULL;
 }
 
+void hide_win_kbm();
+
 void hide_win_gtab()
 {
   win_gtab_max_key_press = 0;
@@ -758,6 +776,7 @@ void hide_win_gtab()
 
   close_gtab_pho_win();
   hide_win_sym();
+  hide_win_kbm();
 }
 
 void minimize_win_gtab()
@@ -824,6 +843,8 @@ char *get_full_str()
 
 void win_gtab_disp_half_full()
 {
+  if (!gwin_gtab)
+    return;
   if (label_full) {
     if ((current_CS->im_state == HIME_STATE_CHINESE && (!current_CS->b_half_full_char)) ||
         (current_CS->tsin_pho_mode == 0))
@@ -836,21 +857,22 @@ void win_gtab_disp_half_full()
   {
     if (label_gtab_sele) gtk_widget_show(label_gtab_sele);
     if (hime_status_tray || (! gtab_hide_row2))
-      gtk_widget_show(label_gtab);
+      if (label_gtab) gtk_widget_show(label_gtab);
   }
   else
   {
     if (label_gtab_sele) gtk_widget_hide(label_gtab_sele);
     if (hime_status_tray || (! gtab_hide_row2))
-      gtk_widget_hide(label_gtab);
+      if (label_gtab) gtk_widget_hide(label_gtab);
   }
 
   if (label_gtab && (gtab_hide_row2))
   {
-    if (hime_win_color_use)
-      gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
-    else
-      gtk_label_set_text(GTK_LABEL(label_gtab), get_full_str());
+    if (hime_win_color_use) {
+      if (label_gtab) gtk_label_set_markup(GTK_LABEL(label_gtab), get_full_str());
+    } else {
+      if (label_gtab) gtk_label_set_text(GTK_LABEL(label_gtab), get_full_str());
+    }
   }
 
   minimize_win_gtab();

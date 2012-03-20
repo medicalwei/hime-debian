@@ -3,13 +3,12 @@
 #define SIM_OUTPUT_TOGGLE "gb output sim"
 #define TRAD_OUTPUT_TOGGLE "gb output trad"
 #define KBM_TOGGLE "kbm toggle"
-#if TRAY_ENABLED
 #define UPDATE_TRAY "update tray"
-#endif
 #define RELOAD_TSIN_DB "reload tsin db"
 #define HIME_EXIT_MESSAGE "hime exit"
 
 
+#define HIME_SETUP_WINDOW_TYPE_UTILITY "hime-setup-window-type-utility"
 #define HIME_FONT_SIZE "hime-font-size"
 #define HIME_FONT_NAME "hime-font-name"
 #define HIME_FONT_SIZE_TSIN_PRESEL "hime-font-size-tsin-presel"
@@ -25,6 +24,7 @@
 #define HIME_POP_UP_WIN "hime-pop-up-win"
 #define HIME_INNER_FRAME "hime-inner-frame"
 #define HIME_INIT_IM_ENABLED "hime-init-im-enabled"
+#define HIME_INIT_FULL_MODE "hime-init-full-mode"
 #define HIME_BELL_VOLUME "hime-bell-volume"
 #define HIME_SOUND_PLAY_OVERLAP "hime-sound-play-overlap"
 #define HIME_ENABLE_CTRL_ALT_SWITCH "hime-enable-ctrl-alt-switch"
@@ -67,6 +67,8 @@
 #define GTAB_VERTICAL_SELECT "gtab-vertical-select"
 #define GTAB_UNIQUE_AUTO_SEND "gtab-unique-auto-send"
 #define GTAB_QUE_WILD_CARD "gtab-que-wild-card"
+#define GTAB_QUE_WILD_CARD_ASTERISK "gtab-que-wild-card-asterisk"
+#define GTAB_PHO_QUERY "gtab-pho-query"
 #define GTAB_PHRASE_PRE_SELECT "gtab-phrase-pre-select"
 #define GTAB_IN_AREA_BUTTON "gtab-in-area-button"
 
@@ -95,7 +97,8 @@
 #define PHONETIC_SPEAK "phonetic-speak"
 #define PHONETIC_SPEAK_SEL "phonetic-speak-sel"
 
-extern int hime_font_size, hime_font_size_tsin_presel, hime_font_size_symbol,
+extern int hime_setup_window_type_utility,
+           hime_font_size, hime_font_size_tsin_presel, hime_font_size_symbol,
            hime_font_size_tsin_pho_in, hime_font_size_pho_near,
            hime_font_size_gtab_in, hime_font_size_win_kbm, hime_font_size_win_kbm_en,
            hime_inner_frame, hime_single_state,
@@ -103,7 +106,8 @@ extern int hime_font_size, hime_font_size_tsin_presel, hime_font_size_symbol,
            gtab_disp_key_codes, gtab_disp_im_name, hime_shift_space_eng_full,
            gtab_invalid_key_in, gtab_hide_row2, gtab_in_row1,
            hime_capslock_lower, pho_hide_row2, pho_in_row1,
-           hime_eng_phrase_enabled, gtab_que_wild_card, hime_win_sym_click_close,
+           hime_eng_phrase_enabled, hime_win_sym_click_close,
+           gtab_que_wild_card, gtab_que_wild_card_asterisk, gtab_pho_query,
            hime_bell_volume, hime_sound_play_overlap, hime_enable_ctrl_alt_switch, hime_on_the_spot_key;
 
 extern int default_input_method;
@@ -119,7 +123,7 @@ extern int gtab_shift_phrase_key, gtab_in_area_button;
 extern int gtab_vertical_select, gtab_unique_auto_send;
 extern int tsin_buffer_size;
 extern int hime_input_style, hime_root_x, hime_root_y, hime_pop_up_win;
-extern int hime_status_tray, hime_tray_hf_win_kbm;
+extern int hime_status_tray, hime_show_win_kbm, hime_tray_hf_win_kbm;
 extern int hime_punc_auto_send;
 
 extern int tsin_phrase_pre_select;
@@ -138,7 +142,7 @@ extern unich_t eng_full_str[], eng_half_str[], cht_full_str[];
 extern char *eng_color_full_str, *eng_color_half_str, *cht_color_full_str;
 extern char *hime_win_color_fg, *hime_win_color_bg;
 extern int hime_win_color_use, hime_bell_off;
-extern int hime_init_im_enabled;
+extern int hime_init_im_enabled, hime_init_full_mode;
 extern int hime_edit_display, hime_tray_display;
 extern char *pho_kbm_name, *pho_selkey, *hime_str_im_cycle;
 extern int pho_candicate_col_N, pho_candicate_R2L;

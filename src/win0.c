@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -165,12 +165,14 @@ extern gboolean b_use_full_space;
 void set_label_space();
 void set_label_space(GtkWidget *label);
 
+void show_win0();
+
 void disp_char(int index, char *ch)
 {
   if (hime_edit_display_ap_only())
     return;
   if (!top_bin)
-    return;
+    show_win0();
 
 //  dbg("disp_char %d %s\n", index, ch);
   create_char(index);
@@ -451,7 +453,10 @@ static void create_cursor_attr()
     pango_attr_list_unref(attr_list);
 
   GdkColor color_bg, color_fg;
-  gdk_color_parse(tsin_cursor_color, &color_bg);
+  if (hime_win_color_use)
+    gdk_color_parse(tsin_cursor_color, &color_bg);
+  else
+    gdk_color_parse(TSIN_CURSOR_COLOR_DEFAULT, &color_bg);
   gdk_color_parse("white", &color_fg);
 
   attr_list = pango_attr_list_new ();
@@ -699,8 +704,11 @@ char *get_full_str();
 
 void win_tsin_disp_half_full()
 {
+  if (label_pho==NULL)
+    show_win0();
+
   if (hime_win_color_use)
-   gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str());
+    gtk_label_set_markup(GTK_LABEL(label_pho), get_full_str());
   else
     gtk_label_set_text(GTK_LABEL(label_pho), get_full_str());
   compact_win0();
