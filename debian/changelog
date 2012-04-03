@@ -1,3 +1,13 @@
+hime (0.9.9-2) unstable; urgency=low
+
+  * im-switch configuration fix
+  * copyright year update
+  * upgrade debian policy standard version to 3.9.3
+  * fix im-switch hook script (Closes: #664657)
+  * set DM-Upload-Allowed to yes
+
+ -- Yao Wei (魏銘廷) <mwei@lxde.org>  Tue, 03 Apr 2012 15:48:37 +0800
+
 hime (0.9.9-1) unstable; urgency=low
 
   * Initial release (Closes: #652022)
