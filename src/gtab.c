@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -350,7 +350,7 @@ static void DispInArea()
 
 //  dbg("sel1st:%d\n", ggg.sel1st_i);
   if (hime_display_on_the_spot_key()) {
-    if (gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab) && poo.same_pho_query_state == SAME_PHO_QUERY_none)
+    if (hime_pop_up_win && gwin_gtab && GTK_WIDGET_VISIBLE(gwin_gtab) && poo.same_pho_query_state == SAME_PHO_QUERY_none)
       hide_win_gtab();
     return;
   }
@@ -474,9 +474,9 @@ static void putstr_inp(char *p)
   clear_after_put();
 
   if ((cur_inmd->flag & FLAG_GTAB_SYM_KBM)) {
-    extern int win_kbm_inited, b_show_win_kbm;
+    extern int win_kbm_inited, hime_show_win_kbm;
     init_in_method(default_input_method);
-    if (win_kbm_inited && !b_show_win_kbm)
+    if (win_kbm_inited && !hime_show_win_kbm)
       hide_win_kbm();
   }
 }
@@ -707,7 +707,10 @@ void disp_selection0(gboolean phrase_selected, gboolean force_disp)
       utf8cpy(uu, &cur_inmd->selkey[i - ofs]);
       char vvv[16];
       char www[1024];
-      sprintf(www, "<span foreground=\"%s\">%s</span>", hime_sel_key_color, htmlspecialchars(uu, vvv));
+      if (hime_win_color_use)
+        sprintf(www, "<span foreground=\"%s\">%s</span>", hime_sel_key_color, htmlspecialchars(uu, vvv));
+      else
+        sprintf(www, "<span foreground=\""HIME_SEL_KEY_COLOR_DEFAULT"\">%s</span>", htmlspecialchars(uu, vvv));
       strcat(tt, www);
 
       if (gtab_vertical_select_on())
@@ -969,7 +972,6 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   gboolean shift_m = (kbstate & ShiftMask) > 0;
 //  gboolean ctrl_m = (kbstate & ControlMask) > 0;
   gboolean capslock_on = (kbstate & LockMask);
-  gboolean is_dayi = !strncmp(cur_inmd->filename, "dayi", 4);
 
   bzero(seltab_phrase, sizeof(seltab_phrase));
 
@@ -977,6 +979,8 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
 
   if (!cur_inmd)
     return 0;
+
+  gboolean is_dayi = !strncmp(cur_inmd->filename, "dayi", 4);
 
   if ((tsin_chinese_english_toggle_key == TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock) &&
       (key == XK_Caps_Lock)){
@@ -1042,17 +1046,16 @@ gboolean feedkey_gtab(KeySym key, int kbstate)
   int ucase;
   ucase = toupper(key);
   if (key < 127 && cur_inmd->keymap[key]) {
-     if (key < 'A' || key > 'z' || (key > 'Z'  && key < 'a') )
-       goto shift_proc;
-     if (cur_inmd->keymap[lcase] != cur_inmd->keymap[ucase])
-       goto next;
-
+    if (key < 'A' || key > 'z' || (key > 'Z'  && key < 'a') )
+      goto shift_proc;
+    if (cur_inmd->keymap[lcase] != cur_inmd->keymap[ucase])
+      goto next;
   }
 
 
 shift_proc:
   if (shift_m && !strchr(cur_inmd->selkey, key) && !ggg.more_pg && key>=' ' && key < 0x7e &&
-       key!='*' && (key!='?' || (gtab_shift_phrase_key && !ggg.ci))) {
+      key!='*' && (key!='?' || (gtab_shift_phrase_key && !ggg.ci))) {
     if (gtab_shift_phrase_key) {
       if (tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
@@ -1294,7 +1297,8 @@ direct_select:
 
       break;
     case '?':
-      if (!gtab_que_wild_card) {
+    case '*':
+      if ((!gtab_que_wild_card && key == '?') || (!gtab_que_wild_card_asterisk && key == '*')) {
         inkey=cur_inmd->keymap[key];
         if ((inkey && (inkey!=cur_inmd->WILD_QUES && inkey!=cur_inmd->WILD_STAR)) || ptr_selkey(key))
           goto next;
@@ -1308,7 +1312,6 @@ direct_select:
             return 0;
 		}
       }
-    case '*':
       if (tss.pre_selN && shift_char_proc(key, kbstate))
         return TRUE;
 
@@ -1358,7 +1361,7 @@ direct_select:
     case XK_Caps_Lock:
       return 0;
     case '`':
-      if (!cur_inmd->keymap[key]) {
+      if (gtab_pho_query && !cur_inmd->keymap[key]) {
         poo.same_pho_query_state = SAME_PHO_QUERY_gtab_input;
         reset_gtab_all();
         disp_gtab_sel(_("輸入要查的同音字，接著在注音視窗選字"));

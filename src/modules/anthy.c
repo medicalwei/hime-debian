@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -607,7 +607,10 @@ static void cursor_markup(int idx, char *s)
 {
   char cur[256];
   GtkWidget *lab = seg[idx].label;
-  sprintf(cur, "<span background=\"%s\">%s</span>", *gmf.mf_tsin_cursor_color, s);
+  if (*gmf.mf_hime_win_color_use)
+    sprintf(cur, "<span foreground=\"white\" background=\"%s\">%s</span>", *gmf.mf_tsin_cursor_color, s);
+  else
+    sprintf(cur, "<span foreground=\"white\" background=\""TSIN_CURSOR_COLOR_DEFAULT"\">%s</span>", s);
   gtk_label_set_markup(GTK_LABEL(lab), cur);
 }
 
@@ -708,7 +711,7 @@ static void send_seg()
   }
 
 //  printf("sent convert '%s'\n", out);
-  gmf.mf_send_text(out);
+  if (out[0] != '\0') gmf.mf_send_text(out);
   clear_all();
 }
 

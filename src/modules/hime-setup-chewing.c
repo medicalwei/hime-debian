@@ -81,7 +81,7 @@ cb_update_setting (GtkWidget *widget, GdkEvent *event, gpointer data)
     return TRUE;
 }
 
-void module_setup_window_create ()
+void module_setup_window_create (GtkButton *button, gpointer data_hime_setup_window_type_utility)
 {
     gboolean bWriteMode = TRUE;
 
@@ -96,7 +96,8 @@ void module_setup_window_create ()
     }
 
     hime_chewing_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-
+    if (data_hime_setup_window_type_utility)
+      gtk_window_set_type_hint(GTK_WINDOW(hime_chewing_window), GDK_WINDOW_TYPE_HINT_UTILITY);
     /* main setup win setting */
     gtk_window_set_position (GTK_WINDOW (hime_chewing_window),
                              GTK_WIN_POS_MOUSE);
@@ -107,7 +108,7 @@ void module_setup_window_create ()
                       NULL);
 
     gtk_window_set_title (GTK_WINDOW (hime_chewing_window),
-                          _("hime 新酷音設定"));
+                          _("新酷音設定"));
     gtk_container_set_border_width (GTK_CONTAINER (hime_chewing_window), 1);
 
     vbox_top = gtk_vbox_new (FALSE, 3);

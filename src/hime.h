@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -87,6 +87,7 @@ typedef enum {
 } IM_TOGGLE_KEYS;
 
 enum {
+  TSIN_CHINESE_ENGLISH_TOGGLE_KEY_None=0,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_CapsLock=1,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Tab=2,
   TSIN_CHINESE_ENGLISH_TOGGLE_KEY_Shift=4,
@@ -109,11 +110,12 @@ enum {
 enum {
   HIME_TRAY_DISPLAY_SINGLE=1,
   HIME_TRAY_DISPLAY_DOUBLE=2,
-#if TRAY_UNITY
   HIME_TRAY_DISPLAY_APPINDICATOR=3,
-#endif
 };
 #endif
+
+#define HIME_SEL_KEY_COLOR_DEFAULT "blue"
+#define TSIN_CURSOR_COLOR_DEFAULT "blue"
 
 #define ROW_ROW_SPACING (2)
 

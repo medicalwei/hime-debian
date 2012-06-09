@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,7 +17,6 @@
 
 #include "hime.h"
 #include "config.h"
-#include "hime-version.h"
 #include "gtab.h"
 #include <signal.h>
 #if HIME_i18n_message
@@ -30,10 +29,11 @@ Display *dpy;
 int win_xl, win_yl;
 int win_x, win_y;   // actual win x/y
 int dpy_xl, dpy_yl;
-DUAL_XIM_ENTRY xim_arr[1];
+Window xim_xwin;
 
 extern unich_t *fullchar[];
 gboolean win_kbm_inited;
+char *get_hime_xim_name();
 
 char *half_char_to_full_char(KeySym xkey)
 {
@@ -46,9 +46,8 @@ static void start_inmd_window()
 {
   GtkWidget *win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_realize (win);
-  GdkWindow *gdkwin0 = gtk_widget_get_window(win);
-  xim_arr[0].xim_xwin = GDK_WINDOW_XWINDOW(gdkwin0);
-  dbg("xim_xwin %x\n", xim_arr[0].xim_xwin);
+  xim_xwin = GDK_WINDOW_XWINDOW(gtk_widget_get_window(win));
+  dbg("xim_xwin %x\n", xim_xwin);
 }
 
 #if USE_XIM
@@ -240,10 +239,12 @@ void open_xim()
   encodings.count_encodings = sizeof(chEncodings)/sizeof(XIMEncoding) - 1;
   encodings.supported_encodings = chEncodings;
 
-  if ((xim_arr[0].xims = IMOpenIM(dpy,
-          IMServerWindow,         xim_arr[0].xim_xwin,        //input window
+  char *xim_name = get_hime_xim_name();
+
+  XIMS xims = IMOpenIM(dpy,
+          IMServerWindow,         xim_xwin,        //input window
           IMModifiers,            "Xi18n",        //X11R6 protocol
-          IMServerName,           xim_arr[0].xim_server_name, //XIM server name
+          IMServerName,           xim_name, //XIM server name
           IMLocale,               lc,
           IMServerTransport,      "X/",      //Comm. protocol
           IMInputStyles,          &im_styles,   //faked styles
@@ -251,10 +252,11 @@ void open_xim()
           IMProtocolHandler,      hime_ProtoHandler,
           IMFilterEventMask,      KeyPressMask|KeyReleaseMask,
           IMOnKeysList, &triggerKeys,
-          NULL)) == NULL) {
-          setenv("NO_GTK_INIT", "", TRUE);
+          NULL);
+
+  if (xims == NULL) {
           p_err("IMOpenIM '%s' failed. Maybe another XIM server is running.\n",
-          xim_arr[0].xim_server_name);
+          xim_name);
   }
 }
 
@@ -273,10 +275,54 @@ void destroy_inmd_menu();
 void load_gtab_list(gboolean);
 void change_win1_font();
 void set_wselkey(char *s);
+void create_win_gtab();
+
+#if TRAY_ENABLED
+void disp_tray_icon();
+#endif
+gboolean init_in_method(int in_no);
+#include "hime-protocol.h"
+#include "im-srv.h"
+
+static int get_in_method_by_filename(char filename[])
+{
+    int i, in_method = 0;
+    gboolean found = FALSE;
+    for(i=0; i < inmdN; i++) {
+      if (strcmp(filename, inmd[i].filename))
+        continue;
+      found = TRUE;
+      in_method = i;
+      break;
+    }
+    if (!found)
+      in_method = default_input_method;
+    return in_method;
+}
 
 static void reload_data()
 {
   dbg("reload_data\n");
+//  Save input method state before reload
+  char temp_inmd_filenames[hime_clientsN][128];
+  HIME_STATE_E temp_CS_im_states[hime_clientsN];
+  char temp_current_CS_inmd_filename[128] = "";
+  HIME_STATE_E temp_current_CS_im_state = 0;
+  if (current_CS) {
+    temp_current_CS_im_state = current_CS->im_state;
+    strcpy(temp_current_CS_inmd_filename, inmd[current_CS->in_method].filename);
+  }
+  int c;
+  for(c=0;c<hime_clientsN;c++) {
+    strcpy(temp_inmd_filenames[c], "");
+    temp_CS_im_states[c] = HIME_STATE_DISABLED;
+    if (!hime_clients[c].cs)
+      continue;
+    ClientState *cs = hime_clients[c].cs;
+    temp_CS_im_states[c] = cs->im_state;
+    strcpy(temp_inmd_filenames[c], inmd[cs->in_method].filename);
+  }
+
   load_setttings();
   if (current_method_type()==method_type_TSIN)
     set_wselkey(pho_selkey);
@@ -297,6 +343,24 @@ static void reload_data()
 #if TRAY_ENABLED
   update_item_active_all();
 #endif
+
+//  Load input method state after reload, which may change inmd
+  // load clientstate properties back
+  for(c=0;c<hime_clientsN;c++) {
+    if (!hime_clients[c].cs)
+      continue;
+    hime_clients[c].cs->im_state = HIME_STATE_CHINESE;
+    hime_clients[c].cs->in_method = get_in_method_by_filename(temp_inmd_filenames[c]);
+    init_in_method(hime_clients[c].cs->in_method);
+    if (temp_CS_im_states[c] == HIME_STATE_DISABLED)
+      toggle_im_enabled();
+    hime_clients[c].cs->im_state = temp_CS_im_states[c];
+  }
+  current_CS->im_state = HIME_STATE_CHINESE;
+  init_in_method(get_in_method_by_filename(temp_current_CS_inmd_filename));
+  if (temp_current_CS_im_state == HIME_STATE_DISABLED)
+    toggle_im_enabled();
+  current_CS->im_state = temp_current_CS_im_state;
 }
 
 void change_tsin_font_size();
@@ -305,6 +369,7 @@ void change_pho_font_size();
 void change_win_sym_font_size();
 void change_win_gtab_style();
 extern gboolean win_kbm_on;
+extern void change_module_font_size();
 
 static void change_font_size()
 {
@@ -318,6 +383,7 @@ static void change_font_size()
   update_win_kbm_inited();
   change_win1_font();
 //  change_win_pho_style();
+  change_module_font_size();
 }
 
 static int xerror_handler(Display *d, XErrorEvent *eve)
@@ -326,7 +392,8 @@ static int xerror_handler(Display *d, XErrorEvent *eve)
 }
 
 Atom hime_atom;
-void disp_tray_icon(), toggle_gb_output();
+
+void toggle_gb_output();
 
 void cb_trad_sim_toggle()
 {
@@ -336,13 +403,14 @@ void cb_trad_sim_toggle()
 #endif
 }
 void execute_message(char *message), show_win_kbm(), hide_win_kbm();
-int b_show_win_kbm=0;
 void disp_win_kbm_capslock_init();
 
-void kbm_open_close(gboolean b_show)
+extern int hime_show_win_kbm;
+void kbm_open_close(GtkButton *checkmenuitem, gboolean b_show)
 {
-  b_show_win_kbm=b_show;
-  if (b_show) {
+  hime_show_win_kbm=b_show;
+
+  if (hime_show_win_kbm) {
     show_win_kbm();
     disp_win_kbm_capslock_init();
   } else
@@ -352,7 +420,7 @@ void kbm_open_close(gboolean b_show)
 void kbm_toggle()
 {
   win_kbm_inited = 1;
-  kbm_open_close(!b_show_win_kbm);
+  kbm_open_close(NULL, ! hime_show_win_kbm);
 }
 
 
@@ -392,11 +460,9 @@ void message_cb(char *message)
    if (!strcmp(message, KBM_TOGGLE)) {
      kbm_toggle();
    } else
-#if UNIX
    if (strstr(message, "#hime_message")) {
      execute_message(message);
    } else
-#endif
 #if TRAY_ENABLED
    if (!strcmp(message, UPDATE_TRAY)) {
      disp_tray_icon();
@@ -439,14 +505,17 @@ static GdkFilterReturn my_gdk_filter(GdkXEvent *xevent,
 void init_atom_property()
 {
   hime_atom = get_hime_atom(dpy);
-  XSetSelectionOwner(dpy, hime_atom, xim_arr[0].xim_xwin, CurrentTime);
+  XSetSelectionOwner(dpy, hime_atom, xim_xwin, CurrentTime);
 }
 
 void hide_win0();
 void destroy_win0();
 void destroy_win1();
 void destroy_win_gtab();
-void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase(), destroy_tray();
+void free_pho_mem(),free_tsin(),free_all_IC(), free_gtab(), free_phrase();
+#if TRAY_ENABLED
+void destroy_tray();
+#endif
 
 void do_exit()
 {
@@ -466,7 +535,9 @@ void do_exit()
   destroy_win_gtab();
 #endif
 
+#if TRAY_ENABLED
   destroy_tray();
+#endif
 
   gtk_main_quit();
 }
@@ -476,35 +547,17 @@ void sig_do_exit(int sig)
   do_exit();
 }
 
-char *get_hime_xim_name();
 void load_phrase(), init_TableDir();
 void init_tray(), exec_setup_scripts();
-#if UNIX
 void init_hime_im_serv(Window win);
-#else
-void init_hime_im_serv();
-#endif
 void init_tray_double();
 
 #if TRAY_UNITY
 void init_tray_appindicator();
 #endif
 
-#if WIN32
-void init_hime_program_files();
- #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
-#endif
-int win32_tray_disabled = 1;
-
-
 gboolean delayed_start_cb(gpointer data)
 {
-#if WIN32
-  Sleep(200);
-#endif
-
-  win32_tray_disabled = 0;
-
 #if TRAY_ENABLED
   if (hime_status_tray) {
     if (hime_tray_display == HIME_TRAY_DISPLAY_SINGLE)
@@ -513,7 +566,7 @@ gboolean delayed_start_cb(gpointer data)
       init_tray_double();
 #if TRAY_UNITY
     else if (hime_tray_display == HIME_TRAY_DISPLAY_APPINDICATOR)
-    init_tray_appindicator();
+      init_tray_appindicator();
 #endif
   }
 #endif
@@ -558,8 +611,6 @@ int main(int argc, char **argv)
 #endif
   }
 
-//putenv("GDK_NATIVE_WINDOWS=1");
-
   set_is_chs();
 
   char *lc_ctype = getenv("LC_CTYPE");
@@ -589,15 +640,10 @@ int main(int argc, char **argv)
   else
     lc = lc_ctype;
 
-  char *xim_server_name = get_hime_xim_name();
-
-  strcpy(xim_arr[0].xim_server_name, xim_server_name);
-
   dbg("hime XIM will use %s as the default encoding\n", lc_ctype);
 #endif
 
   if (argc == 2 && (!strcmp(argv[1], "-v") || !strcmp(argv[1], "--version") || !strcmp(argv[1], "-h")) ) {
-    setenv("NO_GTK_INIT", "", TRUE);
 #if GIT_HAVE
     p_err(" version %s (git %s)\n", HIME_VERSION, GIT_HASH);
 #else
@@ -639,7 +685,7 @@ int main(int argc, char **argv)
   // void *olderr =
     XSetErrorHandler((XErrorHandler)xerror_handler);
 
-  init_hime_im_serv(xim_arr[0].xim_xwin);
+  init_hime_im_serv(xim_xwin);
 
   exec_setup_scripts();
 

@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -70,9 +70,6 @@ int main(int argc, char **argv)
   char s[64];
   int phrase_area_N=0;
   char *phrase_area = NULL;
-
-  if (!getenv("NO_GTK_INIT"))
-    gtk_init(&argc, &argv);
 
   if (argc > 1)
     fname = argv[1];
@@ -214,7 +211,7 @@ int main(int argc, char **argv)
   fclose(fp);
 
   if (getenv("HIME_NO_RELOAD")==NULL) {
-    /* caleb- does found where "reload" is used.
+    /* caleb- did not found where "reload" is used.
      * caleb- think the send_hime_message() here does nothing.
      */
     send_hime_message(GDK_DISPLAY(), "reload");

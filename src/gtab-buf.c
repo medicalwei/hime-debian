@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -201,7 +201,10 @@ static char *gen_buf_str_disp()
     char *t = spec;
 
     if (i==ggg.gbuf_cursor) {
-      sprintf(www, "<span background=\"%s\">%s</span>", tsin_cursor_color, spec);
+      if (hime_win_color_use)
+        sprintf(www, "<span foreground=\"white\" background=\"%s\">%s</span>", tsin_cursor_color, spec);
+      else
+        sprintf(www, "<span foreground=\"white\" background=\""TSIN_CURSOR_COLOR_DEFAULT"\">%s</span>", spec);
       t = www;
     }
 
@@ -934,13 +937,18 @@ void save_gtab_buf_phrase(KeySym key)
 
 gboolean save_gtab_buf_shift_enter()
 {
-	int N = ggg.gbufN - ggg.gbuf_cursor;
-	if (!N)
-		return 0;
+  if (!ggg.gbufN)
+    return 0;
+  int idx0 = 0;
+  if (ggg.gbufN != ggg.gbuf_cursor)
+    idx0 = ggg.gbuf_cursor;
+  int len = ggg.gbufN - idx0;
+  if (len > MAX_PHRASE_LEN)
+    return 0;
 
-	save_gtab_buf_phrase_idx(ggg.gbuf_cursor, N);
-	gbuf_cursor_end();
-	return 1;
+  save_gtab_buf_phrase_idx(idx0, len);
+  gbuf_cursor_end();
+  return 1;
 }
 
 
@@ -1047,9 +1055,10 @@ void gtab_scan_pre_select(gboolean b_incr)
   for(i=0;i<tss.pre_selN; i++) {
     char ts[(MAX_PHRASE_LEN+3) * CH_SZ + 1];
     char *br= (i < tss.pre_selN-1 && gtab_vertical_select_on())?"\n":"";
-
-    sprintf(ts, "<span foreground=\"%s\">%c</span>%s%s", hime_sel_key_color,
-      cur_inmd->selkey[i], tss.pre_sel[i].str, br);
+    if (hime_win_color_use)
+      sprintf(ts, "<span foreground=\"%s\">%c</span>%s%s", hime_sel_key_color, cur_inmd->selkey[i], tss.pre_sel[i].str, br);
+    else
+      sprintf(ts, "<span foreground=\""HIME_SEL_KEY_COLOR_DEFAULT"\">%c</span>%s%s", cur_inmd->selkey[i], tss.pre_sel[i].str, br);
     strcat(tt, ts);
     if (!gtab_vertical_select_on() && i < tss.pre_selN-1)
       strcat(tt, " ");
@@ -1080,7 +1089,7 @@ gboolean gtab_pre_select_idx(int c)
   gbuf[ggg.gbufN-1].flag |= FLAG_CHPHO_PHRASE_TAIL;
 
   hide_gtab_pre_sel();
-  if (hime_edit_display_ap_only())
+  if (hime_pop_up_win)
     hide_win_gtab();
 
   return TRUE;

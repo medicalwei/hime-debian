@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 cwlin <https://github.com/cwlin>
+/* Copyright (C) 2011-2012 cwlin <https://github.com/cwlin>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
 #ifndef CHEWING_H
 #define CHEWING_H
 
-#include <chewing/chewing.h>
+#include <chewing.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdint.h>
@@ -38,9 +38,11 @@
 #define HIME_CHEWING_DEFAULT_SELECT_KEYS { '1', '2', '3', '4', \
                                            '5', '6', '7', '8', \
                                            '9', '0' }
+#define HIME_CHEWING_DEFAULT_NUMBER_OF_SELECT_KEYS 10
 
 #define HIME_CHEWING_DEFAULT_KEY_MIN (XK_space)
 #define HIME_CHEWING_DEFAULT_KEY_MAX (XK_asciitilde + 1)
+#define HIME_CHEWING_KEY_MIN         (0x00)
 #define HIME_CHEWING_KEY_MAX         (XK_Delete + 1)
 
 #define HIME_CHEWING_WRAPPER_FUNC(FUNC_NAME) return (chewing_buffer_Len (g_pChewingCtx) \

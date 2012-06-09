@@ -3,8 +3,8 @@
 
 GTK_2_DEMO_APP=gtk-demo
 GTK_3_DEMO_APP=gtk3-demo
-GTK_QUERY_IMMODULES_2=gtk-query-immodules-2.0
-GTK_QUERY_IMMODULES_3=gtk-query-immodules-3.0
+GTK_QUERY_IMMODULES_2=`whereis gtk-query-immodules-2.0 | cut -d ' ' -f 2`
+GTK_QUERY_IMMODULES_3=`whereis gtk-query-immodules-3.0 | cut -d ' ' -f 2`
 
 export HIME_OUTPUT_FILTER=$PWD/filter/nobopomofo
 UTF8_LOCALE=`locale -a | grep utf8 | tail -n 1`
@@ -13,7 +13,7 @@ XIM_NAME=`date +%N | tr -d 0`
 GTK_2_TEMP_FILE=$PWD/gtk2
 GTK_3_TEMP_FILE=$PWD/gtk3
 
-[ ! -e distro/debian ] && exec echo Please run this script under hime directory, thanks.
+[ ! -e distro/debian ] && exec echo Please execute '"distro/dev-tools/scripts/test-hime"' under hime directory, thanks.
 
 export PATH=$PWD/src:$PATH
 export HIME_TABLE_DIR=$PWD/data
@@ -44,9 +44,10 @@ HIME_PID=$!
 
 [ $(id -u $USER) != "0" ] && kill -HUP $HIME_PID
 
-rm $GTK_2_TEMP_FILE $GTK_3_TEMP_FILE /tmp/hime-$USER/socket-*-$XIM_NAME
+# TODO: get tempdir from TMPDIR, TMP, and TEMP
+rm $GTK_2_TEMP_FILE $GTK_3_TEMP_FILE /tmp/.hime-$USER/socket-*-$XIM_NAME
 
-# Copyright (C) 2007-2011 Wen-Yen Chuang <caleb AT calno DOT com>
+# Copyright (C) 2007-2012 Wen-Yen Chuang <caleb AT calno DOT com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public

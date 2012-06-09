@@ -8,11 +8,10 @@ CFLAGS= -DUNIX=1 $(WALL) $(OPTFLAGS) $(GTKINC) -I./IMdkit/include -I./im-client 
         -DHIME_ICON_DIR=\"$(HIME_ICON_DIR)\" \
         -DHIME_SCRIPT_DIR=\"$(HIME_SCRIPT_DIR)\" -DHIME_BIN_DIR=\"$(HIME_BIN_DIR)\" \
         -DSYS_ICON_DIR=\"$(SYS_ICON_DIR)\" -DFREEBSD=$(FREEBSD) -DMAC_OS=$(MAC_OS) \
+        -DHIME_VERSION=\"$(shell head -n 1 ../ChangeLog)\" \
         -DG_DISABLE_SINGLE_INCLUDES -DG_DISABLE_DEPRECATED \
         -DGDK_DISABLE_SINGLE_INCLUDES -DGDK_DISABLE_DEPRECATED \
         -DGTK_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_DEPRECATED -DGSEAL_ENABLE
-
-VERSION_FILE = ../VERSION.hime
 
 OBJ_IMSRV = im-addr.o im-dispatch.o im-srv.o hime-crypt.o
 
@@ -72,7 +71,7 @@ OBJS_gtab2cin     = gtab2cin.o gtab-util.o util.o locale.o
 OBJS_gtab_merge   = hime-gtab-merge.o gtab-util.o util.o locale.o
 OBJS_hime_setup   = hime-setup.o hime-conf.o util.o hime-settings.o \
 	hime-setup-list.o locale.o hime-setup-pho.o about.o \
-	lang.o hime-icon.o hime-setup-gtab.o gtab-list.o hime-exec-script.o \
+	lang.o hime-icon.o hime-setup-gtab.o hime-setup-appearance.o gtab-list.o hime-exec-script.o \
 	pho-kbm-name.o hime-module-cb.o
 
 OBJS_hime_gb_toggle  = hime-gb-toggle.o  hime-conf.o util.o
@@ -94,7 +93,10 @@ endif
 
 ifeq ($(USE_TRAY),Y)
 CFLAGS     += -DTRAY_ENABLED=1
-OBJS       += tray.o eggtrayicon.o tray-double.o
+OBJS       += tray.o tray-double.o
+ifeq ($(GTK),gtk+-2.0)
+OBJS       += gdkpixbuf-drawable.o
+endif
 ifeq ($(USE_UNITY),Y)
 CFLAGS     += -DTRAY_UNITY=1
 OBJS       += tray-appindicator.o
@@ -158,7 +160,7 @@ PROGS_CV  = kbmcv pin-juyin
 	@$(CCX) $(CFLAGS) -E -o $@ $<
 
 
-all: hime-version.h $(PROGS) $(PROGS_SYM) $(DATA) $(PROGS_CV)
+all: $(PROGS) $(PROGS_SYM) $(DATA) $(PROGS_CV)
 	if [ $(BUILD_MODULE) = 'Y' ]; then $(MAKE) -C modules; fi
 	if [ $(GTK_IM) = 'Y' ]; then $(MAKE) -C gtk-im; fi
 	if [ $(GTK3_IM) = 'Y' ]; then $(MAKE) -C gtk3-im; fi
@@ -276,11 +278,6 @@ pin-juyin: $(OBJS_pin_juyin)
 hime-tsin2gtab-phrase: $(OBJS_tsin2gtab_phrase)
 	@echo "linking $@ ..."
 	@$(CCLD) -o $@ $^ $(LDFLAGS)
-
-
-hime-version.h: $(VERSION_FILE)
-	@echo "building $@ ... current version is '"`cat $<`"'"
-	@echo '#define HIME_VERSION "'`cat $<`'"' > $@
 
 install:
 	install -d $(bindir)

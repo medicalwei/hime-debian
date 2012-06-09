@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -18,18 +18,22 @@
 #include "hime.h"
 #include "gtab.h"
 
+int hime_setup_window_type_utility;
+
 int hime_font_size, hime_font_size_tsin_presel, hime_font_size_symbol;
-int hime_font_size_pho_near, hime_font_size_gtab_in, hime_font_size_win_kbm, hime_font_size_win_kbm_en;
+int hime_font_size_pho_near, hime_font_size_gtab_in, hime_font_size_win_kbm, hime_font_size_win_kbm_en, hime_show_win_kbm;
 int hime_win_color_use, hime_single_state;
 int hime_remote_client;
 char *default_input_method_str;
 int default_input_method;
 // int left_right_button_tips;
 int hime_im_toggle_keys, hime_bell_off;
-int hime_capslock_lower, hime_eng_phrase_enabled, hime_init_im_enabled;
+int hime_capslock_lower, hime_eng_phrase_enabled, hime_init_im_enabled, hime_init_full_mode;
 int hime_win_sym_click_close, hime_edit_display;
-int hime_on_the_spot_key, hime_tray_hf_win_kbm, hime_punc_auto_send;
-int hime_tray_display;
+int hime_on_the_spot_key, hime_punc_auto_send;
+#if TRAY_ENABLED
+int hime_tray_display, hime_tray_hf_win_kbm;
+#endif
 
 int gtab_dup_select_bell;
 int gtab_space_auto_first;
@@ -45,7 +49,8 @@ int gtab_hide_row2;
 int gtab_in_row1;
 int gtab_vertical_select;
 int gtab_unique_auto_send;
-int gtab_que_wild_card, gtab_in_area_button;
+int gtab_que_wild_card, gtab_que_wild_card_asterisk, gtab_pho_query;
+int gtab_in_area_button;
 
 int tsin_phrase_pre_select, tsin_tone_char_input;
 int tsin_capslock_upper, tsin_use_pho_near;
@@ -69,9 +74,8 @@ int tsin_tab_phrase_end;
 int hime_input_style, hime_root_x, hime_root_y, hime_pop_up_win;
 int hime_inner_frame;
 char *hime_font_name, *hime_win_color_fg, *hime_win_color_bg;
-#if TRAY_ENABLED
+// TODO: move it into if TRAY_ENABLED block
 int hime_status_tray;
-#endif
 
 int pho_hide_row2, pho_in_row1;
 int hime_bell_volume;
@@ -84,6 +88,12 @@ int get_hime_conf_int(char *name, int default_value);
 
 void load_setttings()
 {
+#if TRAY_UNITY
+  const char* desktop = getenv("XDG_CURRENT_DESKTOP");
+#endif
+
+  hime_setup_window_type_utility = get_hime_conf_int(HIME_SETUP_WINDOW_TYPE_UTILITY, 0);
+
   hime_font_size = get_hime_conf_int(HIME_FONT_SIZE, 16);
   get_hime_conf_str(HIME_FONT_NAME, &hime_font_name, "Sans");
   hime_font_size_tsin_presel = get_hime_conf_int(HIME_FONT_SIZE_TSIN_PRESEL, 16);
@@ -99,8 +109,12 @@ void load_setttings()
   hime_pop_up_win = get_hime_conf_int(HIME_POP_UP_WIN, 0);
   hime_inner_frame = get_hime_conf_int(HIME_INNER_FRAME, 1);
   hime_eng_phrase_enabled = get_hime_conf_int(HIME_ENG_PHRASE_ENABLED, 1);
+#if TRAY_ENABLED
   hime_tray_hf_win_kbm = get_hime_conf_int(HIME_TRAY_HF_WIN_KBM, 0);
+#endif
+  hime_show_win_kbm = get_hime_conf_int(KBM_TOGGLE, 0);
   hime_init_im_enabled = get_hime_conf_int(HIME_INIT_IM_ENABLED, 0);
+  hime_init_full_mode = get_hime_conf_int(HIME_INIT_FULL_MODE, 0);
 
   hime_single_state = get_hime_conf_int(HIME_SINGLE_STATE, 0);
   hime_punc_auto_send = get_hime_conf_int(HIME_PUNC_AUTO_SEND, 0);
@@ -119,11 +133,23 @@ void load_setttings()
 #endif
 //  left_right_button_tips = get_hime_conf_int(LEFT_RIGHT_BUTTON_TIPS, 1);
   hime_im_toggle_keys = get_hime_conf_int(HIME_IM_TOGGLE_KEYS, 0);
+  hime_win_sym_click_close = get_hime_conf_int(HIME_WIN_SYM_CLICK_CLOSE, 1);
 #if TRAY_ENABLED
   hime_status_tray = get_hime_conf_int(HIME_STATUS_TRAY, 1);
+#if TRAY_UNITY
+  if (desktop != NULL && strcmp("Unity", desktop) == 0) {
+    hime_tray_display = get_hime_conf_int(HIME_TRAY_DISPLAY, HIME_TRAY_DISPLAY_APPINDICATOR);
+  }
+  else {
+    hime_tray_display = get_hime_conf_int(HIME_TRAY_DISPLAY, HIME_TRAY_DISPLAY_DOUBLE);
+  }
+#else
+  hime_tray_display = get_hime_conf_int(HIME_TRAY_DISPLAY, HIME_TRAY_DISPLAY_DOUBLE);
 #endif
-  hime_win_sym_click_close = get_hime_conf_int(HIME_WIN_SYM_CLICK_CLOSE, 1);
-  hime_tray_display = get_hime_conf_int(HIME_TRAY_DISPLAY, 2);
+#else
+// TODO: remove it
+  hime_status_tray = 0;
+#endif
 
   gtab_dup_select_bell = get_hime_conf_int(GTAB_DUP_SELECT_BELL, 0);
   gtab_space_auto_first = get_hime_conf_int(GTAB_SPACE_AUTO_FIRST, GTAB_space_auto_first_none);
@@ -140,6 +166,8 @@ void load_setttings()
   gtab_vertical_select = get_hime_conf_int(GTAB_VERTICAL_SELECT, GTAB_OPTION_NO);
   gtab_unique_auto_send = get_hime_conf_int(GTAB_UNIQUE_AUTO_SEND, GTAB_OPTION_NO);
   gtab_que_wild_card = get_hime_conf_int(GTAB_QUE_WILD_CARD, 0);
+  gtab_que_wild_card_asterisk = get_hime_conf_int(GTAB_QUE_WILD_CARD_ASTERISK, 1);
+  gtab_pho_query = get_hime_conf_int(GTAB_PHO_QUERY, 1);
   gtab_phrase_pre_select = get_hime_conf_int(GTAB_PHRASE_PRE_SELECT, 1);
   gtab_in_area_button = get_hime_conf_int(GTAB_IN_AREA_BUTTON, 0);
 
@@ -164,8 +192,8 @@ void load_setttings()
   pho_in_row1 = get_hime_conf_int(PHO_IN_ROW1, 1);
 
   get_hime_conf_str(TSIN_PHRASE_LINE_COLOR, &tsin_phrase_line_color, "blue");
-  get_hime_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, "blue");
-  get_hime_conf_str(HIME_SEL_KEY_COLOR, &hime_sel_key_color, "blue");
+  get_hime_conf_str(TSIN_CURSOR_COLOR, &tsin_cursor_color, TSIN_CURSOR_COLOR_DEFAULT);
+  get_hime_conf_str(HIME_SEL_KEY_COLOR, &hime_sel_key_color, HIME_SEL_KEY_COLOR_DEFAULT);
 
   if (eng_color_full_str) {
     g_free(eng_color_full_str);

@@ -2,8 +2,8 @@
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * License as published by the Free Software Foundation version 2.1
+ * of the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -108,8 +108,6 @@ void get_keymap_str(u_int64_t k, char *keymap, int keybits, char tkey[]);
 
 int main(int argc, char **argv)
 {
-  gtk_init(&argc, &argv);
-
 #if 1
   if (argc != 3)
     p_err("%s a_file.gtab outfile", argv[0]);
