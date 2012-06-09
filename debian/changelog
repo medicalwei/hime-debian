@@ -4,6 +4,8 @@ hime (0.9.9+git20120609.dfsg-1) experimental; urgency=low
   * debian/rules:
     - dirty hack for autoclean
     - remove moving gtk immodules to specific directories
+  * debian/hime.install, debian/hime-gtk3-immodule.install:
+    update gtk immodules install path
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sat, 09 Jun 2012 11:42:18 +0800
 
