@@ -2,6 +2,9 @@ http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: hime
 Upstream-Contact: Wen-Yen Chuang <caleb@calno.com> 
 Source: http://hime.luna.com.tw/
+Comment: The dayi table is packed in typical package but they generate
+ DFSG-free package which can be downloaded from upstream (which cannot get
+ from git source).
 
 Files: *
 Copyright: 2011-2012 Edward Der-Hua Liu
