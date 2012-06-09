@@ -1,7 +1,9 @@
 hime (0.9.9+git20120609.dfsg-1) experimental; urgency=low
 
   * Imported Upstream version 0.9.9+git20120609.dfsg
-  * debian/rules: dirty hack for autoclean
+  * debian/rules:
+    - dirty hack for autoclean
+    - remove moving gtk immodules to specific directories
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sat, 09 Jun 2012 11:42:18 +0800
 
