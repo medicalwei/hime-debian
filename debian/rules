@@ -18,12 +18,6 @@ override_dh_auto_clean:
 override_dh_auto_install:
 	make install DESTDIR=$(CURDIR)/debian/tmp
 
-	# move libraries to the correspond gtk version
-	mkdir -p debian/tmp/usr/lib/gtk-2.0/$(GTK2VER)
-	mv debian/tmp/usr/lib/gtk-2.0/immodules debian/tmp/usr/lib/gtk-2.0/$(GTK2VER)/
-	mkdir -p debian/tmp/usr/lib/gtk-3.0/$(GTK3VER)
-	mv debian/tmp/usr/lib/gtk-3.0/immodules debian/tmp/usr/lib/gtk-3.0/$(GTK3VER)/
-
 	# workaround to move arch-dep tables to /usr/lib
 	mv debian/tmp/usr/share/hime/table debian/tmp/usr/lib/hime/
 	ln -s /usr/lib/hime/table debian/tmp/usr/share/hime/table
