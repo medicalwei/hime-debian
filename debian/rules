@@ -11,6 +11,7 @@ GTK3VER = $(shell pkg-config --variable=gtk_binary_version gtk+-3.0)
 	dh $@ 
 
 override_dh_auto_clean:
+	touch config.mak # dirty hack to make Makefile thinks config.mak exists
 	make clean
 	rm config.mak
  
