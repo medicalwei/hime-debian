@@ -1,7 +1,10 @@
 hime (0.9.9+git20120609+dfsg-1) unstable; urgency=low
 
   * Imported Upstream version 0.9.9+git20120609+dfsg
-  * debian/control, debian/compat: upgrade dh compatibility to 9
+  * debian/control:
+    - upgrade dh compatibility to 9
+    - add dependency to dpkg-dev
+  * debian/compat: upgrade dh compatibility to 9
   add copyright information for DFSG git package
   * debian/rules:
     - dirty hack for autoclean
