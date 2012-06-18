@@ -7,6 +7,7 @@ hime (0.9.9+git20120609+dfsg-1) experimental; urgency=low
   * debian/hime.install, debian/hime-gtk3-immodule.install:
     update gtk immodules install path
   * debian/copyright: add copyright information for DFSG git package
+  * debian/compat: upgrade dh compability to 9
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Sat, 09 Jun 2012 11:42:18 +0800
 
