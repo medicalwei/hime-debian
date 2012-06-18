@@ -1,6 +1,8 @@
-Subject: Transparent LDFLAGS
- This patch is for Debian to add additional flags to LDFLAGS.
-Forwarded: not-needed
+Subject: pass LDFLAGS envvars to Makefile
+ This patch is used to pass LDFLAGS envvars to Makefile.
+ Pull request sent to upstream. Not yet replied.
+Forwarded: https://github.com/caleb-/hime/pull/379
+Last-Update: 2012-06-18
 Author: Yao Wei (魏銘廷) <mwei@lxde.org>
 
 --- a/configure
