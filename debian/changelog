@@ -1,6 +1,6 @@
-hime (0.9.9+git20120609.dfsg-1) experimental; urgency=low
+hime (0.9.9+git20120609+dfsg-1) experimental; urgency=low
 
-  * Imported Upstream version 0.9.9+git20120609.dfsg
+  * Imported Upstream version 0.9.9+git20120609+dfsg
   * debian/rules:
     - dirty hack for autoclean
     - remove moving gtk immodules to specific directories
