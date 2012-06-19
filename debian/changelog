@@ -1,4 +1,4 @@
-hime (0.9.9+git20120609+dfsg-1) unstable; urgency=low
+hime (0.9.9+git20120619+dfsg-1) unstable; urgency=low
 
   * Imported Upstream version 0.9.9+git20120609+dfsg
   * debian/control:
