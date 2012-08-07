@@ -3,6 +3,7 @@ hime (0.9.10-1) experimental; urgency=low
   * Imported Upstream version 0.9.10
   * debian/hime.install: update the list
   * debian/hime-data.install: remove duplicated changelog
+  * debian/watch: update the url
 
  -- Yao Wei (魏銘廷) <mwei@lxde.org>  Thu, 19 Jul 2012 15:48:28 +0800
 
