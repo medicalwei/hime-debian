@@ -1,4 +1,4 @@
-hime (0.9.10-1) experimental; urgency=low
+hime (0.9.10-1) unstable; urgency=low
 
   * Imported Upstream version 0.9.10
   * debian/hime.install: update the list
