@@ -1,11 +1,19 @@
-hime (0.9.10-1) unstable; urgency=low
+hime (0.9.10-1) unstable; urgency=medium
 
+  [ Yao Wei (魏銘廷) ]
   * Imported Upstream version 0.9.10
   * debian/hime.install: update the list
   * debian/hime-data.install: remove duplicated changelog
   * debian/watch: update the url
 
- -- Yao Wei (魏銘廷) <mwei@lxde.org>  Thu, 19 Jul 2012 15:48:28 +0800
+  [ ChangZhuo Chen (陳昌倬) ]
+  * Add ChangZhuo Chen (陳昌倬) as Uploaders
+  * Remove DM-Upload-Allowed
+  * Update Vcs-Git
+  * Update debian/copyright for GFDL-1.2
+  * Add keywords.patch for desktop keyword
+
+ -- ChangZhuo Chen (陳昌倬) <czchen@gmail.com>  Thu, 20 Feb 2014 18:55:38 +0800
 
 hime (0.9.9+git20120619+dfsg-1) unstable; urgency=low
 

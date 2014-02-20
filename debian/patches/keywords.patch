@@ -1,0 +1,8 @@
+Description: Add Keywords in .desktop
+--- hime-0.9.10.orig/menu/hime-setup.desktop
++++ hime-0.9.10/menu/hime-setup.desktop
+@@ -13,3 +13,4 @@ Terminal=false
+ Type=Application
+ StartupNotify=true
+ Categories=Settings;
++Keywords=hime;input method;
