@@ -1,1 +1,2 @@
 keywords.patch
+fix-ftbfs-on-kfreebsd.diff
