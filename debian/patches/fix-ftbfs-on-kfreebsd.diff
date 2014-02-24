@@ -1,7 +1,7 @@
 Description: Fix FTBFS on kfreebsd-*
  This patch makes configure script not to consider GNU/kFreeBSD as a FreeBSD
  distribution.
-Forwarded: no
+Forwarded: https://github.com/hime-ime/hime/pull/487
 Author: Yao Wei <mwei@lxde.org>
 Last-Update: 2014-02-24
 
