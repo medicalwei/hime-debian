@@ -1,6 +1,6 @@
 Source: hime
 Section: utils
-Priority: optional
+Priority: extra
 Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org>
 Uploaders:
  Yao Wei (魏銘廷) <mwei@lxde.org>,
